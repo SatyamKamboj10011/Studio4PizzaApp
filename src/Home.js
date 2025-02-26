@@ -2,24 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import CustomNavbar from "./Navbar"; // Import Navbar
 
 const Home = () => {
   return (
     <Container fluid className="p-0">
-      <CustomNavbar /> {/* Navbar */}
-
       {/* 🌟 Hero Section */}
       <div className="hero-section">
         <h1 className="hero-title">The Best Pizza in the World! 🍕🔥</h1>
         <p className="hero-subtitle">Savor the perfect blend of flavors and freshness in every bite!</p>
-        <Link to="/pizza">
+        <Link to="/pizzas">
           <Button className="hero-button">Order Now 🚀</Button>
         </Link>
       </div>
 
       {/* 🌟 Features Section */}
       <Container className="my-5">
+        <h2 className="text-center mb-5 feature-section-title">Why Choose Us?</h2>
         <Row className="justify-content-center">
           {[
             {
@@ -38,7 +36,7 @@ const Home = () => {
               image: "https://images.unsplash.com/photo-1617347454431-f49d7ff5c3b1?w=600&auto=format&fit=crop&q=60",
             },
           ].map((feature, index) => (
-            <Col key={index} md={4} className="d-flex align-items-stretch">
+            <Col key={index} md={4} className="d-flex align-items-stretch mb-4">
               <Card className="feature-card">
                 <Card.Img variant="top" src={feature.image} className="feature-img" />
                 <Card.Body>
@@ -75,7 +73,7 @@ const Home = () => {
           }
 
           .hero-title {
-            font-size: 3.8rem;
+            font-size: 4.5rem;
             font-weight: 700;
             letter-spacing: 2px;
             font-family: 'Playfair Display', serif;
@@ -83,11 +81,11 @@ const Home = () => {
           }
 
           .hero-subtitle {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 400;
             font-family: 'Poppins', sans-serif;
             max-width: 600px;
-            margin: 10px auto;
+            margin: 20px auto;
             animation: fadeInUp 1.2s ease-in-out;
           }
 
@@ -100,6 +98,7 @@ const Home = () => {
             border-radius: 30px;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             font-family: 'Poppins', sans-serif;
+            animation: fadeInUp 1.4s ease-in-out;
           }
 
           .hero-button:hover {
@@ -108,6 +107,15 @@ const Home = () => {
           }
 
           /* 🌟 Features Section */
+          .feature-section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1s ease-in-out;
+          }
+
           .feature-card {
             border-radius: 12px;
             overflow: hidden;
@@ -117,6 +125,7 @@ const Home = () => {
             border: none;
             color: black;
             text-align: center;
+            animation: fadeInUp 1.2s ease-in-out;
           }
 
           .feature-card:hover {
@@ -133,12 +142,13 @@ const Home = () => {
             font-weight: 700;
             font-size: 1.5rem;
             font-family: 'Playfair Display', serif;
+            color: #333;
           }
 
           .feature-text {
             font-size: 1rem;
             font-family: 'Poppins', sans-serif;
-            color: #333;
+            color: #555;
           }
 
           /* 🌟 Footer */
@@ -151,6 +161,12 @@ const Home = () => {
             font-size: 1.1rem;
             font-weight: 600;
             font-family: 'Poppins', sans-serif;
+          }
+
+          .footer-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
           }
 
           /* ✨ Animations */

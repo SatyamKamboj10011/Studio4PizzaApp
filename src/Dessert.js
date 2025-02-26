@@ -1,70 +1,70 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 
-const drinks = [
+const desserts = [
   {
     id: 1,
-    name: "Coca Cola",
-    image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Chocolate Cake",
+    image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 6.99,
   },
   {
     id: 2,
-    name: "Pepsi",
-    image: "https://images.unsplash.com/photo-1624552184280-9e9631bbeee9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Cheesecake",
+    image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 7.99,
   },
   {
     id: 3,
-    name: "Mirinda",
-    image: "https://images.unsplash.com/photo-1624552184280-9e9631bbeee9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Tiramisu",
+    image: "https://images.unsplash.com/photo-1627308595186-0bdc1f9b1f6a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 8.99,
   },
   {
     id: 4,
-    name: "Red Bull",
-    image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Macarons",
+    image: "https://images.unsplash.com/photo-1612203985729-70726954388c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 5.99,
   },
   {
     id: 5,
-    name: "Monster",
-    image: "https://images.unsplash.com/photo-1624552184280-9e9631bbeee9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Ice Cream Sundae",
+    image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 4.99,
   },
   {
     id: 6,
-    name: "Fanta",
-    image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Red Velvet Cake",
+    image: "https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 6.99,
   },
   {
     id: 7,
-    name: "Nimbooz",
-    image: "https://images.unsplash.com/photo-1624552184280-9e9631bbeee9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Panna Cotta",
+    image: "https://images.unsplash.com/photo-1606474845626-9267a6a5c6a7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 7.99,
   },
   {
     id: 8,
-    name: "Coke Zero Sugar",
-    image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Chocolate Mousse",
+    image: "https://images.unsplash.com/photo-1606313564203-9662a354b0d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 5.99,
   },
   {
     id: 9,
-    name: "Sprite",
-    image: "https://images.unsplash.com/photo-1624552184280-9e9631bbeee9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Fruit Tart",
+    image: "https://images.unsplash.com/photo-1627308595136-37606644a5a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 6.99,
   },
   {
     id: 10,
-    name: "L&P",
-    image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    price: 3.5,
+    name: "Creme Brulee",
+    image: "https://images.unsplash.com/photo-1606474845626-9267a6a5c6a7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+    price: 8.99,
   },
 ];
 
-const DrinkMenu = () => {
+const DessertMenu = () => {
   const [cart, setCart] = useState({});
 
   const updateQuantity = (id, delta) => {
@@ -78,47 +78,47 @@ const DrinkMenu = () => {
   return (
     <div
       style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+        backgroundImage: "url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         minHeight: "100vh",
       }}
     >
-      {/* Drink Menu */}
+      {/* Dessert Menu */}
       <Container className="py-5">
         <h1 className="text-center text-white mb-4" style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)" }}>
-          🥤 Drink Menu
+          🍰 Dessert Menu
         </h1>
         <Row className="g-4">
-          {drinks.map((drink) => (
-            <Col key={drink.id} xs={12} sm={6} md={4} lg={3}>
-              <Card className="h-100 shadow-lg border-0 drink-card">
+          {desserts.map((dessert) => (
+            <Col key={dessert.id} xs={12} sm={6} md={4} lg={3}>
+              <Card className="h-100 shadow-lg border-0 dessert-card">
                 <Card.Img
                   variant="top"
-                  src={drink.image}
-                  alt={drink.name}
-                  className="drink-image"
+                  src={dessert.image}
+                  alt={dessert.name}
+                  className="dessert-image"
                 />
                 <Card.Body className="d-flex flex-column">
                   <Card.Title className="text-center text-success fw-bold">
-                    {drink.name}
+                    {dessert.name}
                   </Card.Title>
                   <Card.Text className="text-center fw-bold">
-                    ${drink.price.toFixed(2)}
+                    ${dessert.price.toFixed(2)}
                   </Card.Text>
                   <div className="d-flex justify-content-center align-items-center mb-3">
                     <Button
                       variant="outline-danger"
                       size="sm"
-                      onClick={() => updateQuantity(drink.id, -1)}
+                      onClick={() => updateQuantity(dessert.id, -1)}
                     >
                       -
                     </Button>
-                    <span className="mx-3 fw-bold">{cart[drink.id] || 0}</span>
+                    <span className="mx-3 fw-bold">{cart[dessert.id] || 0}</span>
                     <Button
                       variant="outline-success"
                       size="sm"
-                      onClick={() => updateQuantity(drink.id, 1)}
+                      onClick={() => updateQuantity(dessert.id, 1)}
                     >
                       +
                     </Button>
@@ -127,9 +127,9 @@ const DrinkMenu = () => {
                     variant="success"
                     className="mt-auto add-to-cart-button"
                     onClick={() =>
-                      alert(`Added ${cart[drink.id] || 0} ${drink.name} to cart!`)
+                      alert(`Added ${cart[dessert.id] || 0} ${dessert.name} to cart!`)
                     }
-                    disabled={!cart[drink.id]}
+                    disabled={!cart[dessert.id]}
                   >
                     Add to Cart
                   </Button>
@@ -143,8 +143,8 @@ const DrinkMenu = () => {
       {/* ✨ Ultimate CSS Magic */}
       <style>
         {`
-          /* 🌟 Drink Card */
-          .drink-card {
+          /* 🌟 Dessert Card */
+          .dessert-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             overflow: hidden;
@@ -152,19 +152,19 @@ const DrinkMenu = () => {
             animation: fadeInUp 0.5s ease-in-out;
           }
 
-          .drink-card:hover {
+          .dessert-card:hover {
             transform: translateY(-10px);
             box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
           }
 
-          .drink-image {
+          .dessert-image {
             height: 200px;
-            object-fit: contain;
+            object-fit: cover;
             padding: 1rem;
             transition: transform 0.3s ease-in-out;
           }
 
-          .drink-card:hover .drink-image {
+          .dessert-card:hover .dessert-image {
             transform: scale(1.1);
           }
 
@@ -206,4 +206,4 @@ const DrinkMenu = () => {
   );
 };
 
-export default DrinkMenu;
+export default DessertMenu;
