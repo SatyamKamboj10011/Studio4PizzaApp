@@ -19,6 +19,8 @@ const NavbarComponent = () => {
         <Navbar.Collapse id="navbar-nav">
           <Nav className="ms-auto">
             {[
+
+              { path: "/Login", name: "Login" },
               { path: "/pizzas", name: "Pizza" },
               { path: "/side", name: "Side" },
               { path: "/dessert", name: "Dessert" },
