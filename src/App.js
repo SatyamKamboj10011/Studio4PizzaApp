@@ -6,6 +6,7 @@ import Drink from "./Drink";
 import SideMenu from "./Side";
 import Navbar from "./Navbar"; // Import the Navbar component
 import DessertMenu from "./Dessert";
+import Registration from "./Registration";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/drink" element={<Drink />} />
         <Route path="/side" element={<SideMenu />} />
         <Route path="/dessert" element={<DessertMenu />} />
+        <Route path="/Registration" element={<Registration />} />
         {/* <Route path="/checkout" element={<Checkout />} /> */}
       </Routes>
     </Router>
