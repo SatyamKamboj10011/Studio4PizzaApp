@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import OnionPizzaImage from './images/beef and onion.jpg';
 import MargheritaPizzaImage from './images/Margherita Pizza.jpg';
 import BBQChickenPizzaImage from './images/BBQ Chicken Pizza.jpg';
@@ -16,6 +17,7 @@ const pizzas = [
   { id: 6, name: "Hawaiian Pizza", image:HawaiianPizzaImage },
 ];
 
+
 const prices = {
   small: 10.99,
   large: 15.99,
@@ -31,6 +33,16 @@ const Pizza = () => {
     setCart([...cart, newItem]);
     alert(`${quantity} ${size} ${pizza} added to cart! Total: $${totalPrice.toFixed(2)}`);
   };
+  const handleCheckout = () => {
+    const customer = {
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "123-456-7890",
+    };
+
+    navigate("/invoice", { state: { cart, customer } });
+  };
+  
 
   // Inline Styles
   const styles = {
