@@ -4,22 +4,21 @@ import Pizza from "./Pizza";
 import Home from "./Home";
 import Drink from "./Drink";
 import SideMenu from "./Side";
-import Navbar from "./Navbar"; // Import the Navbar component
+import Navbar from "./Navbar";
 import DessertMenu from "./Dessert";
+import Checkout from "./Checkout"; // Import the Checkout component
 
 function App() {
   return (
     <Router>
-      {/* Include the Navbar component here */}
       <Navbar />
-
       <Routes>
         <Route path="/pizzas" element={<Pizza />} />
         <Route path="/" element={<Home />} />
         <Route path="/drink" element={<Drink />} />
         <Route path="/side" element={<SideMenu />} />
         <Route path="/dessert" element={<DessertMenu />} />
-        {/* <Route path="/checkout" element={<Checkout />} /> */}
+        <Route path="/checkout" element={<Checkout />} /> {/* Add the Checkout route */}
       </Routes>
     </Router>
   );
