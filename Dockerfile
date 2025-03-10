@@ -1,19 +1,25 @@
-# specifies the base image for the Docker container.
-FROM node:18-alpine
+# Use Node.js as a builder
+FROM node:18-alpine AS builder
 
-# This sets the working directory inside the container to /app. All subsequent commands (e.g., COPY, RUN, CMD) will be executed in this directory
+# Set working directory
 WORKDIR /app
 
-# This copies the package.json file from your local directory (where the Dockerfile is located) into the /app directory inside the container. 
-COPY package.json .
-
+# Copy package.json and install dependencies
+COPY package.json ./
 RUN npm install
 
-# This copies the rest of the files from your local directory (where the Dockerfile is located) into the /app directory inside the container
-
+# Copy all files and build the React app
 COPY . .
+RUN npm run build
 
-EXPOSE 3000
+# Use Nginx to serve the production build
+FROM nginx:alpine
 
-# This specifies the command to run when the container starts. In this case, it runs npm start
-CMD ["npm", "start"]
+# Copy the built React files to the Nginx HTML directory
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
