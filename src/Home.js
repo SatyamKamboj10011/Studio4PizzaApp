@@ -1,39 +1,57 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import { Container, Row, Col, Button, Card, Carousel } from "react-bootstrap";
+import { FaFacebook, FaInstagram, FaTwitter, FaEnvelope } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Home = () => {
   return (
     <Container fluid className="p-0">
       {/* 🌟 Hero Section */}
-      <div className="hero-section">
-        <h1 className="hero-title">The Best Pizza in the World! 🍕🔥</h1>
-        <p className="hero-subtitle">Savor the perfect blend of flavors and freshness in every bite!</p>
-        <Link to="/pizzas">
-          <Button className="hero-button">Order Now 🚀</Button>
-        </Link>
-      </div>
+      <Carousel fade controls={false} indicators={false} interval={3000}>
+        {[
+          "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop",
+          "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1950&auto=format&fit=crop",
+        ].map((image, index) => (
+          <Carousel.Item key={index}>
+            <div
+              className="hero-section"
+              style={{ backgroundImage: `url(${image})` }}
+            >
+              <div className="hero-content">
+                <h1 className="hero-title">The Best Pizza in the World! 🍕🔥</h1>
+                <p className="hero-subtitle">
+                  Savor the perfect blend of flavors and freshness in every bite!
+                </p>
+                <Link to="/pizzas">
+                  <Button className="hero-button">Order Now 🚀</Button>
+                </Link>
+              </div>
+            </div>
+          </Carousel.Item>
+        ))}
+      </Carousel>
 
-      {/* 🌟 Features Section */}
+      {/* 🌟 Featured Deals Section */}
       <Container className="my-5">
-        <h2 className="text-center mb-5 feature-section-title">Why Choose Us?</h2>
+        <h2 className="text-center mb-5 feature-section-title">Special Offers</h2>
         <Row className="justify-content-center">
           {[
             {
-              title: "Authentic Italian Taste",
-              text: "Crafted with the finest ingredients and baked to perfection.",
-              image: "https://images.unsplash.com/photo-1621702379146-3c084cb0bfaa?q=80&w=2070&auto=format&fit=crop",
+              title: "Buy 1 Get 1 Free 🍕",
+              text: "Grab our special combo and enjoy two delicious pizzas for the price of one!",
+              image: "https://images.unsplash.com/photo-1544395676-https://img.freepik.com/premium-psd/buy-1-get-1-free-pizza-fast-food-restaurant-promotion-social-media-template_723663-98.jpg",
             },
             {
-              title: "World-Class Chefs",
-              text: "Our chefs ensure every pizza is an exquisite masterpiece.",
-              image: "https://plus.unsplash.com/premium_photo-1661288474987-1e90159ff2ca?q=80&w=2070&auto=format&fit=crop",
+              title: "Family Combo 🍕🍕🍕",
+              text: "Perfect for family dinners with our special family-sized pizzas!",
+              image: "https://images.unsplash.com/photo-1533777419517-3e4017e2e15a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             },
             {
-              title: "Lightning-Fast Delivery",
-              text: "Your pizza, hot and fresh, delivered in 30 minutes!",
-              image: "https://images.unsplash.com/photo-1617347454431-f49d7ff5c3b1?w=600&auto=format&fit=crop&q=60",
+              title: "30 Min Delivery Guarantee ⚡",
+              text: "Hot pizza delivered to your door in 30 minutes or less!",
+              image: "https://images.unsplash.com/photo-1610886147082-2f8dfa0c1f1b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZmFzdCUyMGRlbGl2ZXJ5fGVufDB8fDB8fHww",
             },
           ].map((feature, index) => (
             <Col key={index} md={4} className="d-flex align-items-stretch mb-4">
@@ -49,10 +67,81 @@ const Home = () => {
         </Row>
       </Container>
 
+      {/* 🌟 Testimonials Section */}
+      <Container className="my-5">
+        <h2 className="text-center mb-5 feature-section-title">What Our Customers Say</h2>
+        <Row className="justify-content-center">
+          <Col md={8}>
+            <Carousel className="testimonial-carousel">
+              {[
+                {
+                  quote: "The best pizza I’ve ever had! Fresh, hot, and always delicious!",
+                  author: "Sarah J.",
+                  image: "https://randomuser.me/api/portraits/women/44.jpg",
+                },
+                {
+                  quote: "Lightning-fast delivery and amazing quality. Highly recommend!",
+                  author: "Mark P.",
+                  image: "https://randomuser.me/api/portraits/men/32.jpg",
+                },
+                {
+                  quote: "I love the family combos. The kids can’t get enough!",
+                  author: "Emily L.",
+                  image: "https://randomuser.me/api/portraits/women/12.jpg",
+                },
+              ].map((testimonial, index) => (
+                <Carousel.Item key={index}>
+                  <div className="testimonial">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.author}
+                      className="testimonial-img"
+                    />
+                    <blockquote>{testimonial.quote}</blockquote>
+                    <footer>- {testimonial.author}</footer>
+                  </div>
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          </Col>
+        </Row>
+      </Container>
+
       {/* 🌟 Footer */}
       <footer className="footer">
-        <p className="footer-text">🔥 Taste the Best, Love the Rest! 🔥</p>
-        <p>&copy; {new Date().getFullYear()} The Best Pizza. All rights reserved.</p>
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h5>Pizza Palace</h5>
+              <p className="mt-2">
+                The best pizza in town, now delivered straight to your door!
+              </p>
+            </Col>
+            <Col md={4}>
+              <h5>Quick Links</h5>
+              <ul className="footer-links">
+                <li><Link to="/aboutus">About Us</Link></li>
+                <li><Link to="/contact">Contact</Link></li>
+                <li><Link to="/menu">Menu</Link></li>
+              </ul>
+            </Col>
+            <Col md={4}>
+              <h5>Follow Us</h5>
+              <div className="social-icons">
+                <a href="https://facebook.com"><FaFacebook /></a>
+                <a href="https://instagram.com"><FaInstagram /></a>
+                <a href="https://twitter.com"><FaTwitter /></a>
+              </div>
+              <div className="newsletter">
+                <input type="email" placeholder="Enter your email" />
+                <Button variant="danger">Subscribe</Button>
+              </div>
+            </Col>
+          </Row>
+          <div className="text-center mt-4">
+            <p>&copy; {new Date().getFullYear()} Pizza Palace. All rights reserved.</p>
+          </div>
+        </Container>
       </footer>
 
       {/* ✨ Ultimate CSS Magic */}
@@ -60,16 +149,22 @@ const Home = () => {
         {`
           /* 🌟 Hero Section */
           .hero-section {
-            background: url('https://images.unsplash.com/photo-1570560258879-af7f8e1447ac?q=80&w=1974&auto=format&fit=crop') no-repeat center/cover;
+            background-size: cover;
+            background-position: center;
             color: white;
             text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
             padding: 150px 20px;
             text-align: center;
             min-height: 85vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
+            position: relative;
+          }
+
+          .hero-content {
+            position: relative;
+            z-index: 2;
           }
 
           .hero-title {
@@ -107,30 +202,17 @@ const Home = () => {
           }
 
           /* 🌟 Features Section */
-          .feature-section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            font-family: 'Playfair Display', serif;
-            color: #333;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            animation: fadeInUp 1s ease-in-out;
-          }
-
           .feature-card {
             border-radius: 12px;
             overflow: hidden;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: none;
-            color: black;
-            text-align: center;
-            animation: fadeInUp 1.2s ease-in-out;
+            background: white;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
           }
 
           .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.3);
           }
 
           .feature-img {
@@ -151,22 +233,100 @@ const Home = () => {
             color: #555;
           }
 
-          /* 🌟 Footer */
-          .footer {
-            background: linear-gradient(90deg, #ff416c, #ff4b2b);
-            color: white;
+          /* 🌟 Testimonials Section */
+          .testimonial {
             text-align: center;
-            padding: 25px;
-            margin-top: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
           }
 
-          .footer-text {
+          .testimonial-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+          }
+
+          .testimonial blockquote {
             font-size: 1.2rem;
+            font-family: 'Poppins', sans-serif;
+            color: #555;
+            font-style: italic;
+          }
+
+          .testimonial footer {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+          }
+
+          /* 🌟 Footer */
+          .footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+          }
+
+          .footer h5 {
             font-weight: 700;
+            margin-bottom: 20px;
+          }
+
+          .footer-links {
+            list-style: none;
+            padding: 0;
+          }
+
+          .footer-links li {
             margin-bottom: 10px;
+          }
+
+          .footer-links a {
+            color: white;
+            text-decoration: none;
+          }
+
+          .footer-links a:hover {
+            text-decoration: underline;
+          }
+
+          .social-icons {
+            display: flex;
+            gap: 15px;
+            font-size: 1.5rem;
+          }
+
+          .social-icons a {
+            color: white;
+            transition: color 0.3s ease;
+          }
+
+          .social-icons a:hover {
+            color: #ff4b2b;
+          }
+
+          .newsletter {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+          }
+
+          .newsletter input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+          }
+
+          .newsletter button {
+            background: #ff4b2b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
           }
 
           /* ✨ Animations */
