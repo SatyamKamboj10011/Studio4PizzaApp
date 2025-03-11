@@ -12,11 +12,10 @@ const Pizza = () => {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    // Fetch pizza data from the backend (Express API)
     axios.get("http://localhost:5000/menu")
       .then((response) => {
-        setPizzas(response.data);  // Store the pizza data
-        console.log(response.data);  // Log the pizza data
+        setPizzas(response.data);
+        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error fetching pizzas:", error);
@@ -24,6 +23,11 @@ const Pizza = () => {
   }, []);
 
   const addToCart = (pizza, size, quantity) => {
+    if (quantity < 1) {
+      alert("Quantity must be at least 1.");
+      return;
+    }
+
     const totalPrice = pizza[prices[size]] * quantity;
     const newItem = { pizza, size, quantity, totalPrice };
     setCart([...cart, newItem]);
@@ -31,7 +35,7 @@ const Pizza = () => {
   };
 
   const handleImageError = (e) => {
-    e.target.src = "https://via.placeholder.com/400x200.png?text=Image+Not+Available"; // Fallback image if loading fails
+    e.target.src = "https://via.placeholder.com/400x200.png?text=Image+Not+Available";
   };
 
   const styles = {
@@ -46,38 +50,30 @@ const Pizza = () => {
     sizeSelect: { width: "100%", padding: "0.5rem", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "1rem", fontSize: "1rem" },
     quantityInput: { width: "100%", padding: "0.5rem", border: "1px solid #ddd", borderRadius: "8px", marginBottom: "1rem", fontSize: "1rem" },
     addToCartButton: { width: "100%", padding: "0.75rem", backgroundColor: "#4caf50", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", cursor: "pointer", transition: "background-color 0.3s" },
-    addToCartButtonHover: { backgroundColor: "#45a049" },
     cartSummary: { position: "fixed", bottom: "1rem", right: "1rem", backgroundColor: "white", padding: "1.5rem", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" },
     cartItem: { marginBottom: "0.5rem" },
     cartItemPrice: { color: "#666", fontSize: "0.9rem" },
     checkoutButton: { width: "100%", padding: "0.75rem", backgroundColor: "#4caf50", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", cursor: "pointer", transition: "background-color 0.3s" },
-    checkoutButtonHover: { backgroundColor: "#45a049" },
   };
 
   return (
     <div style={styles.pizzaPage}>
-      {/* Main Content */}
       <div style={styles.pizzaContainer}>
         <h2 style={styles.pageTitle}>🍕 Pizza Menu</h2>
         <div style={styles.pizzaGrid}>
           {pizzas.map((pizza) => (
             <div key={pizza.id} style={styles.pizzaCard}>
-              {/* Add base URL for images */}
               <img
-  src={`http://localhost:5000/images/${pizza.image}`} 
-  alt={pizza.name}
-  style={styles.pizzaImage}
-  onError={handleImageError} // Handle missing images
-/>
-
+                src={`http://localhost:5000/images/${pizza.image}`} 
+                alt={pizza.name}
+                style={styles.pizzaImage}
+                onError={handleImageError}
+              />
               <h3 style={styles.pizzaName}>{pizza.name}</h3>
               <p style={styles.pizzaPrice}>
                 Small: ${pizza.small_price} | Large: ${pizza.large_price} | XL: ${pizza.extra_large_price}
               </p>
-              <select
-                id={`size-${pizza.id}`}
-                style={styles.sizeSelect}
-              >
+              <select id={`size-${pizza.id}`} style={styles.sizeSelect}>
                 <option value="small">Small</option>
                 <option value="large">Large</option>
                 <option value="extraLarge">Extra Large</option>
@@ -93,7 +89,7 @@ const Pizza = () => {
                 style={styles.addToCartButton}
                 onClick={() => {
                   const size = document.getElementById(`size-${pizza.id}`).value;
-                  const quantity = parseInt(document.getElementById(`quantity-${pizza.id}`).value);
+                  const quantity = parseInt(document.getElementById(`quantity-${pizza.id}`).value, 10);
                   addToCart(pizza, size, quantity);
                 }}
               >
@@ -104,7 +100,6 @@ const Pizza = () => {
         </div>
       </div>
 
-      {/* Cart Summary */}
       {cart.length > 0 && (
         <div style={styles.cartSummary}>
           <h3>🛒 Cart Summary</h3>
@@ -114,10 +109,7 @@ const Pizza = () => {
               <p style={styles.cartItemPrice}>${item.totalPrice.toFixed(2)}</p>
             </div>
           ))}
-          <button
-            style={styles.checkoutButton}
-            onClick={() => alert("Proceed to Checkout")}
-          >
+          <button style={styles.checkoutButton} onClick={() => alert("Proceed to Checkout")}>
             Checkout
           </button>
         </div>
