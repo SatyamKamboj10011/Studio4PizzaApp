@@ -4,16 +4,18 @@ import Pizza from "./Pizza";
 import Home from "./Home";
 import Drink from "./Drink";
 import SideMenu from "./Side";
-import Navbar from "./Navbar"; // Import the Navbar component
+import Navbar from "./Navbar";
 import DessertMenu from "./Dessert";
+<<<<<<< HEAD
 import Login from "./Login";
+=======
+import Checkout from "./Checkout"; // Import the Checkout component
+>>>>>>> e89ce78582f1801bc151c00185bc5ed34db57cce
 
 function App() {
   return (
     <Router>
-      {/* Include the Navbar component here */}
       <Navbar />
-
       <Routes>
         <Route path="/" element={<Home />} /> 
         <Route path="/pizzas" element={<Pizza />} />
@@ -21,7 +23,11 @@ function App() {
         <Route path="/drink" element={<Drink />} />
         <Route path="/side" element={<SideMenu />} />
         <Route path="/dessert" element={<DessertMenu />} />
+<<<<<<< HEAD
        <Route path="/Login" element={<Login/>} />
+=======
+        <Route path="/checkout" element={<Checkout />} /> {/* Add the Checkout route */}
+>>>>>>> e89ce78582f1801bc151c00185bc5ed34db57cce
       </Routes>
     </Router>
   );
