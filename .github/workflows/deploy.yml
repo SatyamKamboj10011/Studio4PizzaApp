@@ -1,9 +1,9 @@
-name: Deploy React App to Apache
+name: Deploy React App to Apache Server
 
 on:
   push:
     branches:
-      - main
+      - main  # Change this if using a different branch
 
 jobs:
   deploy:
@@ -14,58 +14,36 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install SSH & SSHPass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
+        run: sudo apt-get install -y sshpass
 
-      - name: Debug SSH Variables
+      - name: Build React App
         run: |
-          echo "Server Host: ${{ secrets.SERVER_HOST }}"
-          echo "Server Username: ${{ secrets.SERVER_USERNAME }}"
+          npm install
+          npm run build
 
-      - name: Deploy React App to Apache Server
+      - name: Transfer Files to Apache Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
             echo "✅ Successfully connected to $SERVER_HOST"
 
-            # Update system
-            sudo apt update -y
-
-            # Install Apache if missing
-            if ! command -v apache2 &> /dev/null; then
-              sudo apt install -y apache2
-              sudo systemctl enable apache2
-              sudo systemctl start apache2
-            fi
-
-            # Install Node.js if missing
-            if ! command -v node &> /dev/null; then
-              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-              sudo apt install -y nodejs
-            fi
-
-            # Navigate to deployment directory
-            sudo mkdir -p /var/www/react-app
-            sudo chown -R $USER:$USER /var/www/react-app
-            cd /var/www/react-app || git clone https://github.com/your-username/your-repo.git . && cd /var/www/react-app
-
-            # Pull latest code
-            git pull origin main
-
-            # Install dependencies and build the project
-            npm install --legacy-peer-deps
-            npm run build
-
-            # Move the build files to Apache's root directory
+            # Clear old files and upload new ones
             sudo rm -rf /var/www/html/*
-            sudo cp -r build/* /var/www/html/
-            sudo chown -R www-data:www-data /var/www/html
-            sudo chmod -R 755 /var/www/html
+            exit
+          EOF
+          
+          sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
 
-            # Restart Apache
+      - name: Restart Apache Server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+            echo "✅ Restarting Apache..."
             sudo systemctl restart apache2
-
-            echo "✅ Deployment complete! React App is live on Apache!"
           EOF
