@@ -1,9 +1,9 @@
-name: Deploy React App to Server
+name: Deploy React App to Apache
 
 on:
   push:
     branches:
-      - main
+      - main  # Change if using another branch
 
 jobs:
   deploy:
@@ -21,32 +21,22 @@ jobs:
           echo "Server Host: ${{ secrets.SERVER_HOST }}"
           echo "Server Username: ${{ secrets.SERVER_USERNAME }}"
 
-      - name: Deploy React App to Server
+      - name: Deploy React App to Apache Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no -o LogLevel=ERROR $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            echo "✅ Successfully connected to $SERVER_HOST"
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << EOF
+            echo "✅ Connected to $SERVER_HOST"
 
-            # Update the system
+            # Update system
             sudo apt update -y
 
             # Install Node.js if missing
             if ! command -v node &> /dev/null; then
               curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
               sudo apt install -y nodejs
-            fi
-
-            # Install 'serve' if missing
-            if ! command -v serve &> /dev/null; then
-              sudo npm install -g serve
-            fi
-
-            # Install 'pm2' if missing
-            if ! command -v pm2 &> /dev/null; then
-              sudo npm install -g pm2
             fi
 
             # Navigate to deployment directory
@@ -61,7 +51,37 @@ jobs:
             npm install --legacy-peer-deps
             npm run build
 
-            # Stop existing app if running
-            pm2 stop react-app || true
+            # Move the build files to Apache's root directory
+            sudo rm -rf /var/www/html/*
+            sudo cp -r build/* /var/www/html/
+            sudo chown -R www-data:www-data /var/www/html
+            sudo chmod -R 755 /var/www/html
 
-    
+            # Enable Apache mod_rewrite for React routing
+            sudo a2enmod rewrite
+            sudo bash -c 'cat > /etc/apache2/sites-available/000-default.conf' << APACHE_CONF
+            <VirtualHost *:80>
+                ServerAdmin admin@example.com
+                DocumentRoot /var/www/html
+
+                <Directory /var/www/html>
+                    Options Indexes FollowSymLinks
+                    AllowOverride All
+                    Require all granted
+                </Directory>
+
+                # Redirect all requests to index.html for React routing
+                RewriteEngine On
+                RewriteCond %{REQUEST_FILENAME} !-f
+                RewriteRule ^ index.html [QSA,L]
+
+                ErrorLog \${APACHE_LOG_DIR}/error.log
+                CustomLog \${APACHE_LOG_DIR}/access.log combined
+            </VirtualHost>
+            APACHE_CONF
+
+            # Restart Apache to apply changes
+            sudo systemctl restart apache2
+
+            echo "✅ Deployment complete! React App is live on Apache!"
+          EOF
