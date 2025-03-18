@@ -16,24 +16,15 @@ jobs:
       - name: Install SSHPass (for SSH password authentication)
         run: sudo apt-get install -y sshpass
 
-      - name: Debug SSH Variables
-        run: |
-          echo "Server Host: ${{ secrets.SERVER_HOST }}"
-          echo "Server Username: ${{ secrets.SERVER_USERNAME }}"
-
       - name: Deploy React App to Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USERNAME@$SERVER_HOST" << EOF
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USERNAME@$SERVER_HOST" << 'EOF'
             echo "✅ Successfully connected to $SERVER_HOST"
-            
-            # Create deployment directory if not exists
-            mkdir -p /var/www/react-app
-            cd /var/www/react-app || git clone https://github.com/your-username/your-repo.git . && cd /var/www/react-app
-            
+
             # Ensure system is updated
             sudo apt update -y
 
@@ -42,6 +33,20 @@ jobs:
               curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
               sudo apt install -y nodejs
             fi
+
+            # Install 'serve' if missing
+            if ! command -v serve &> /dev/null; then
+              sudo npm install -g serve
+            fi
+
+            # Install 'pm2' if missing
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
+            fi
+
+            # Navigate to deployment directory
+            mkdir -p /var/www/react-app
+            cd /var/www/react-app || git clone https://github.com/your-username/your-repo.git . && cd /var/www/react-app
 
             # Pull latest code
             git pull origin main
@@ -52,13 +57,10 @@ jobs:
             # Build the React app
             npm run build
 
-            # Install and use `serve` to host the app
-            npm install -g serve pm2
-
             # Stop any previous instance
             pm2 stop react-app || true
 
-            # Serve the React app in production mode
+            # Start the React app in production mode
             pm2 start "serve -s build -l 80" --name react-app
 
             # Ensure the app starts on reboot
