@@ -3,7 +3,7 @@ name: Deploy React App to Server
 on:
   push:
     branches:
-      - main  # Change if using another branch
+      - main  # Change this if you use another branch
 
 jobs:
   deploy:
@@ -13,8 +13,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install SSHPass (for SSH password authentication)
-        run: sudo apt-get install -y sshpass
+      - name: Install Dependencies on Runner
+        run: sudo apt-get update && sudo apt-get install -y sshpass
 
       - name: Debug SSH Variables
         run: |
@@ -27,11 +27,11 @@ jobs:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << EOF
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
             echo "✅ Successfully connected to $SERVER_HOST"
 
-            # Ensure system is updated
-            sudo apt update -y
+            # Ensure the system is up to date
+            sudo apt update -y && sudo apt upgrade -y
 
             # Install Node.js if missing
             if ! command -v node &> /dev/null; then
@@ -39,35 +39,28 @@ jobs:
               sudo apt install -y nodejs
             fi
 
-            # Install 'serve' if missing
-            if ! command -v serve &> /dev/null; then
-              sudo npm install -g serve
-            fi
+            # Install required global dependencies
+            sudo npm install -g serve pm2
 
-            # Install 'pm2' if missing
-            if ! command -v pm2 &> /dev/null; then
-              sudo npm install -g pm2
-            fi
-
-            # Navigate to deployment directory
-            mkdir -p /var/www/react-app
+            # Set up project directory
+            sudo mkdir -p /var/www/react-app
+            sudo chown -R $USER:$USER /var/www/react-app
             cd /var/www/react-app || git clone https://github.com/your-username/your-repo.git . && cd /var/www/react-app
 
             # Pull latest code
             git pull origin main
 
-            # Install dependencies
-            npm install
-
-            # Build the React app
+            # Install dependencies and build the project
+            npm install --legacy-peer-deps
             npm run build
 
-            # Stop any previous instance
+            # Stop existing app if running
             pm2 stop react-app || true
 
-            # Start the React app in production mode
+            # Serve the React app in production mode
             pm2 start "serve -s build -l 80" --name react-app
 
-            # Ensure the app starts on reboot
+            # Ensure app auto-starts on reboot
             pm2 save
+            pm2 startup | sudo tee /etc/systemd/system/pm2-user.service
           EOF
