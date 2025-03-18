@@ -1,48 +1,124 @@
 import React, { useState, useEffect } from "react";
-import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import { styled } from "@mui/system";
+import { AppBar, Toolbar, IconButton, Typography, Button, Badge, InputBase, Menu, MenuItem } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
-const CustomNavbar = styled(AppBar)(({ theme, scrolled }) => ({
-  background: scrolled ? "rgba(0, 0, 0, 0.85)" : "linear-gradient(90deg, #ff416c, #ff4b2b)",
-  boxShadow: scrolled ? "0px 4px 15px rgba(255, 255, 255, 0.2)" : "0px 4px 15px rgba(255, 64, 91, 0.5)",
+// Styled components
+const CustomNavbar = styled(AppBar)(({ theme }) => ({
+  background: "rgba(0, 0, 0, 0.85)", // Fixed dark background
+  backdropFilter: "blur(10px)",
+  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
   transition: "all 0.3s ease-in-out",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+}));
+
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: "20px",
+  backgroundColor: "rgba(255, 255, 255, 0.1)",
+  marginLeft: theme.spacing(2),
+  width: "100%",
+  maxWidth: "300px",
+  display: "flex",
+  alignItems: "center",
+  padding: "0.25rem 0.5rem",
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  color: "white",
+  padding: theme.spacing(0, 1),
+  pointerEvents: "none",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "white",
+  width: "100%",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(2)})`,
+  },
 }));
 
 const NavbarComponent = () => {
-  const [scrolled, setScrolled] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [cartItems, setCartItems] = useState(3); // Example cart items count
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const navLinks = [
+    { path: "/pizzas", name: "Pizza" },
+    { path: "/side", name: "Side" },
+    { path: "/dessert", name: "Dessert" },
+    { path: "/drink", name: "Drink" },
+    { path: "/addmenu", name: "Add Menu" },
+    { path: "/checkout", name: "Checkout" },
+  ];
 
   return (
-    <CustomNavbar position="sticky" scrolled={scrolled}>
+    <CustomNavbar position="sticky">
       <Toolbar>
         {/* Mobile Menu Button */}
-        <IconButton edge="start" color="inherit" aria-label="menu" sx={{ display: { sm: "none" } }}>
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={handleMenuOpen}
+          sx={{ display: { xs: "block", sm: "none" } }}
+        >
           <MenuIcon />
         </IconButton>
 
+        {/* Mobile Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+          sx={{ display: { xs: "block", sm: "none" } }}
+        >
+          {navLinks.map((item, index) => (
+            <MenuItem key={index} component={Link} to={item.path} onClick={handleMenuClose}>
+              {item.name}
+            </MenuItem>
+          ))}
+        </Menu>
+
         {/* Brand / Logo */}
-        <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: "none", color: "white", fontWeight: "bold", fontSize: "1.8rem" }}>
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          sx={{
+            flexGrow: 1,
+            textDecoration: "none",
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "1.8rem",
+            fontFamily: "'Pacifico', cursive",
+          }}
+        >
           🍕 BestPizza
         </Typography>
 
+        {/* Search Bar */}
+        <Search>
+          <SearchIconWrapper>
+            <SearchIcon />
+          </SearchIconWrapper>
+          <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
+        </Search>
+
         {/* Navigation Links */}
-        <Nav className="d-none d-sm-flex">
-          {[{ path: "/pizzas", name: "Pizza" }, { path: "/side", name: "Side" }, { path: "/dessert", name: "Dessert" }, { path: "/drink", name: "Drink" }, { path: "/addmenu", name: "Add Menu" }, { path: "/checkout", name: "Checkout" }].map((item, index) => (
+        <div sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+          {navLinks.map((item, index) => (
             <Button
               key={index}
               component={Link}
@@ -55,14 +131,21 @@ const NavbarComponent = () => {
                 transition: "all 0.3s ease-in-out",
                 "&:hover": {
                   color: "#ffd700",
-                  textShadow: "0px 0px 8px #ffd700",
+                  transform: "translateY(-2px)",
                 },
               }}
             >
               {item.name}
             </Button>
           ))}
-        </Nav>
+        </div>
+
+        {/* Cart Icon */}
+        <IconButton component={Link} to="/cart" color="inherit" sx={{ ml: 2 }}>
+          <Badge badgeContent={cartItems} color="error">
+            <ShoppingCartIcon />
+          </Badge>
+        </IconButton>
       </Toolbar>
     </CustomNavbar>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Container, Alert } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import {
   TextField,
   Button,
@@ -13,6 +13,7 @@ import {
   MenuItem,
   Snackbar,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import { Close, CloudUpload } from "@mui/icons-material";
 
@@ -28,9 +29,11 @@ const AddMenuPage = () => {
   const [description, setDescription] = useState("");
   const [message, setMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     // Prepare form data
     const formData = new FormData();
@@ -85,6 +88,8 @@ const AddMenuPage = () => {
         setMessage("Error adding item. Please try again.");
       }
       setOpenSnackbar(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,18 +115,24 @@ const AddMenuPage = () => {
   };
 
   return (
-    <Container>
+    <Container style={{ padding: "20px" }}>
       <Box
-        sx={{
-          marginTop: 5,
-          marginBottom: 5,
-          padding: 4,
-          borderRadius: 2,
-          boxShadow: 3,
-          backgroundColor: "background.paper",
+        style={{
+          marginTop: "5rem",
+          marginBottom: "5rem",
+          padding: "2rem",
+          borderRadius: "15px",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
         }}
       >
-        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: "bold", color: "primary.main" }}>
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          style={{ fontWeight: "bold", color: "#ff4b2b" }}
+        >
           Add Menu Item
         </Typography>
 
@@ -137,7 +148,7 @@ const AddMenuPage = () => {
                 required
                 variant="outlined"
                 size="small"
-                sx={{ backgroundColor: "background.paper" }}
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               />
             </Grid>
 
@@ -150,7 +161,7 @@ const AddMenuPage = () => {
                   onChange={(e) => setType(e.target.value)}
                   label="Type"
                   required
-                  sx={{ backgroundColor: "background.paper" }}
+                  style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
                 >
                   <MenuItem value="pizza">Pizza</MenuItem>
                   <MenuItem value="side">Side</MenuItem>
@@ -172,7 +183,7 @@ const AddMenuPage = () => {
                     required
                     variant="outlined"
                     size="small"
-                    sx={{ backgroundColor: "background.paper" }}
+                    style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -185,7 +196,7 @@ const AddMenuPage = () => {
                     required
                     variant="outlined"
                     size="small"
-                    sx={{ backgroundColor: "background.paper" }}
+                    style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
                   />
                 </Grid>
                 {type === "pizza" && (
@@ -199,7 +210,7 @@ const AddMenuPage = () => {
                       required
                       variant="outlined"
                       size="small"
-                      sx={{ backgroundColor: "background.paper" }}
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
                     />
                   </Grid>
                 )}
@@ -218,7 +229,7 @@ const AddMenuPage = () => {
                   required
                   variant="outlined"
                   size="small"
-                  sx={{ backgroundColor: "background.paper" }}
+                  style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
                 />
               </Grid>
             )}
@@ -230,20 +241,29 @@ const AddMenuPage = () => {
                 component="label"
                 fullWidth
                 startIcon={<CloudUpload />}
-                sx={{
+                style={{
                   padding: "10px",
                   borderStyle: "dashed",
-                  borderColor: "primary.main",
-                  color: "primary.main",
-                  "&:hover": {
-                    borderColor: "secondary.main",
-                    color: "secondary.main",
-                  },
+                  borderColor: "#ff4b2b",
+                  color: "#ff4b2b",
                 }}
               >
                 Upload Image
                 <input type="file" hidden onChange={handleImageChange} required />
               </Button>
+              {image && (
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="Preview"
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "10px",
+                    marginTop: "1rem",
+                  }}
+                />
+              )}
             </Grid>
 
             {/* Description Field */}
@@ -258,7 +278,7 @@ const AddMenuPage = () => {
                 required
                 variant="outlined"
                 size="small"
-                sx={{ backgroundColor: "background.paper" }}
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               />
             </Grid>
 
@@ -270,17 +290,17 @@ const AddMenuPage = () => {
                 type="submit"
                 fullWidth
                 size="large"
-                sx={{
+                disabled={loading}
+                style={{
                   borderRadius: "8px",
                   padding: "12px 24px",
-                  marginTop: 2,
+                  marginTop: "2rem",
                   fontWeight: "bold",
-                  "&:hover": {
-                    backgroundColor: "secondary.main",
-                  },
+                  backgroundColor: "#ff4b2b",
+                  color: "#fff",
                 }}
               >
-                Add Item
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Add Item"}
               </Button>
             </Grid>
           </Grid>

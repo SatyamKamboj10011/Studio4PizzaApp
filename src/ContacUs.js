@@ -102,38 +102,6 @@ const ContactUs = () => {
         </Row>
       </Container>
 
-      {/* 🌟 Footer */}
-      <footer className="footer">
-        <Container>
-          <Row>
-            <Col md={4}>
-              <h5>Pizza Palace</h5>
-              <p className="mt-2">
-                The best pizza in town, now delivered straight to your door!
-              </p>
-            </Col>
-            <Col md={4}>
-              <h5>Quick Links</h5>
-              <ul className="footer-links">
-                <li><a href="/about">About Us</a></li>
-                <li><a href="/contact">Contact</a></li>
-                <li><a href="/menu">Menu</a></li>
-              </ul>
-            </Col>
-            <Col md={4}>
-              <h5>Follow Us</h5>
-              <div className="social-icons">
-                <a href="https://facebook.com"><FaFacebook /></a>
-                <a href="https://instagram.com"><FaInstagram /></a>
-                <a href="https://twitter.com"><FaTwitter /></a>
-              </div>
-            </Col>
-          </Row>
-          <div className="text-center mt-4">
-            <p>&copy; {new Date().getFullYear()} Pizza Palace. All rights reserved.</p>
-          </div>
-        </Container>
-      </footer>
 
       {/* ✨ Ultimate CSS Magic */}
       <style>
