@@ -211,6 +211,85 @@ app.post("/add/desserts", upload, (req, res) => {
   });
 });
 
+//ORDERS..............
+app.get("/orders", (req, res) => {
+  db.query("SELECT * FROM orders ORDER BY order_date DESC", (err, result) => {
+    if (err) {
+      console.error("Error fetching orders:", err);
+      return res.status(500).json({ message: "Error fetching orders" });
+    }
+    res.json(result);
+  });
+});
+
+app.post("/place-order", (req, res) => {
+  const { cart } = req.body;
+
+  if (!cart || cart.length === 0) {
+    return res.status(400).json({ message: "Cart is empty. Cannot place an order." });
+  }
+
+  const query = `
+    INSERT INTO orders (item_id, category, size, toppings, total_price) 
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  cart.forEach((item) => {
+    const toppingsString = item.toppings && item.toppings.length > 0 ? item.toppings.join(", ") : null;
+
+    db.query(query, [item.item_id, item.category, item.size, toppingsString, item.total_price], (err) => {
+      if (err) {
+        console.error("Error adding order:", err);
+        return res.status(500).json({ message: "Database error while adding order." });
+      }
+    });
+  });
+
+  res.status(201).json({ message: "Order placed successfully!" });
+});
+
+//CHECKOUT.............
+const crypto = require("crypto"); // For unique order IDs
+
+app.post("/checkout", (req, res) => {
+  const cartItems = req.body.cart; // Get cart data from frontend
+
+  if (!cartItems || cartItems.length === 0) {
+    return res.status(400).json({ error: "Cart is empty!" });
+  }
+
+  const query = `
+    INSERT INTO orders (order_id, user_id, item_id, item_name, category, size, quantity, toppings, total_price, status, payment_status, order_date) 
+    VALUES ?`;
+
+  const values = cartItems.map((item) => [
+    crypto.randomUUID().slice(0, 10), // Unique order ID
+    item.user_id || null, // Default to NULL if user_id is not provided
+    item.item_id,
+    item.name, // Store item name
+    item.category || "Unknown",
+    item.size || "None", // Default size to 'None' if not applicable
+    item.quantity || 1, // Default quantity to 1
+    JSON.stringify(item.toppings || []), // Convert toppings array to JSON
+    parseFloat(item.total_price.toFixed(2)), // Ensure total_price is a valid number
+    "Pending", // Default order status
+    "Unpaid", // Default payment status
+    new Date() // Order timestamp
+  ]);
+
+  console.log("📦 Inserting Order Data:", values);
+
+  db.query(query, [values], (err, result) => {
+    if (err) {
+      console.error("❌ Error inserting order:", err);
+      return res.status(500).json({ error: "Database error while inserting order" });
+    }
+    res.status(201).json({ message: "✅ Order placed successfully!" });
+  });
+});
+
+
+
 // Start Server on Port 5000
 app.listen(5000, () => {
   console.log("Server running on port 5000");
