@@ -3,7 +3,7 @@ name: Deploy React App to Apache
 on:
   push:
     branches:
-      - main  # Change if using another branch
+      - main
 
 jobs:
   deploy:
@@ -27,11 +27,18 @@ jobs:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << EOF
-            echo "✅ Connected to $SERVER_HOST"
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+            echo "✅ Successfully connected to $SERVER_HOST"
 
             # Update system
             sudo apt update -y
+
+            # Install Apache if missing
+            if ! command -v apache2 &> /dev/null; then
+              sudo apt install -y apache2
+              sudo systemctl enable apache2
+              sudo systemctl start apache2
+            fi
 
             # Install Node.js if missing
             if ! command -v node &> /dev/null; then
@@ -57,30 +64,7 @@ jobs:
             sudo chown -R www-data:www-data /var/www/html
             sudo chmod -R 755 /var/www/html
 
-            # Enable Apache mod_rewrite for React routing
-            sudo a2enmod rewrite
-            sudo bash -c 'cat > /etc/apache2/sites-available/000-default.conf' << APACHE_CONF
-            <VirtualHost *:80>
-                ServerAdmin admin@example.com
-                DocumentRoot /var/www/html
-
-                <Directory /var/www/html>
-                    Options Indexes FollowSymLinks
-                    AllowOverride All
-                    Require all granted
-                </Directory>
-
-                # Redirect all requests to index.html for React routing
-                RewriteEngine On
-                RewriteCond %{REQUEST_FILENAME} !-f
-                RewriteRule ^ index.html [QSA,L]
-
-                ErrorLog \${APACHE_LOG_DIR}/error.log
-                CustomLog \${APACHE_LOG_DIR}/access.log combined
-            </VirtualHost>
-            APACHE_CONF
-
-            # Restart Apache to apply changes
+            # Restart Apache
             sudo systemctl restart apache2
 
             echo "✅ Deployment complete! React App is live on Apache!"
