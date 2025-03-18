@@ -43,13 +43,13 @@ jobs:
           
           sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
 
-      - name: Restart Apache Server
-        env:
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
-        run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            echo "✅ Restarting Apache..."
-            sudo systemctl restart apache2
-          EOF
+     # - name: Restart Apache Server
+       # env:
+       #   SERVER_HOST: ${{ secrets.SERVER_HOST }}
+         # SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+        #  SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+       # run: |
+         # sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+          #  echo "✅ Restarting Apache..."
+          #  sudo systemctl restart apache2
+       #   EOF
