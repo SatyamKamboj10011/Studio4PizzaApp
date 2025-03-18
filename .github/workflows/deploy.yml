@@ -3,7 +3,7 @@ name: Deploy React App to Server
 on:
   push:
     branches:
-      - main  # Change if using a different branch
+      - main  # Change if using another branch
 
 jobs:
   deploy:
@@ -13,29 +13,38 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install SSHPass (for password authentication)
+      - name: Install SSHPass (for SSH password authentication)
         run: sudo apt-get install -y sshpass
+
+      - name: Debug SSH Variables
+        run: |
+          echo "Server Host: ${{ secrets.SERVER_HOST }}"
+          echo "Server Username: ${{ secrets.SERVER_USERNAME }}"
 
       - name: Deploy React App to Server
         env:
-          SERVER_IP: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USERNAME }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            # Create directory if not exists
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USERNAME@$SERVER_HOST" << EOF
+            echo "✅ Successfully connected to $SERVER_HOST"
+            
+            # Create deployment directory if not exists
             mkdir -p /var/www/react-app
-            cd /var/www/react-app
-
-            # Pull latest code (if using Git)
-            git clone https://github.com/your-username/your-repo.git . || git pull origin main
+            cd /var/www/react-app || git clone https://github.com/your-username/your-repo.git . && cd /var/www/react-app
+            
+            # Ensure system is updated
+            sudo apt update -y
 
             # Install Node.js if missing
-            if ! command -v node &> /dev/null
-            then
+            if ! command -v node &> /dev/null; then
               curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
               sudo apt install -y nodejs
             fi
+
+            # Pull latest code
+            git pull origin main
 
             # Install dependencies
             npm install
@@ -43,13 +52,15 @@ jobs:
             # Build the React app
             npm run build
 
-            # Install `serve` to serve the app
+            # Install and use `serve` to host the app
             npm install -g serve pm2
 
-            # Stop old instance (if running)
+            # Stop any previous instance
             pm2 stop react-app || true
 
-            # Serve the built React app
+            # Serve the React app in production mode
             pm2 start "serve -s build -l 80" --name react-app
+
+            # Ensure the app starts on reboot
             pm2 save
           EOF
