@@ -16,13 +16,18 @@ jobs:
       - name: Install SSHPass (for SSH password authentication)
         run: sudo apt-get install -y sshpass
 
+      - name: Debug SSH Variables
+        run: |
+          echo "Server Host: ${{ secrets.SERVER_HOST }}"
+          echo "Server Username: ${{ secrets.SERVER_USERNAME }}"
+
       - name: Deploy React App to Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no "$SERVER_USERNAME@$SERVER_HOST" << 'EOF'
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << EOF
             echo "✅ Successfully connected to $SERVER_HOST"
 
             # Ensure system is updated
