@@ -3,7 +3,7 @@ name: Deploy React App to Server
 on:
   push:
     branches:
-      - main  # Change this if you use another branch
+      - main
 
 jobs:
   deploy:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Dependencies on Runner
+      - name: Install SSH & SSHPass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
       - name: Debug SSH Variables
@@ -27,11 +27,11 @@ jobs:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no -o LogLevel=ERROR $SERVER_USERNAME@$SERVER_HOST << 'EOF'
             echo "✅ Successfully connected to $SERVER_HOST"
 
-            # Ensure the system is up to date
-            sudo apt update -y && sudo apt upgrade -y
+            # Update the system
+            sudo apt update -y
 
             # Install Node.js if missing
             if ! command -v node &> /dev/null; then
@@ -39,10 +39,17 @@ jobs:
               sudo apt install -y nodejs
             fi
 
-            # Install required global dependencies
-            sudo npm install -g serve pm2
+            # Install 'serve' if missing
+            if ! command -v serve &> /dev/null; then
+              sudo npm install -g serve
+            fi
 
-            # Set up project directory
+            # Install 'pm2' if missing
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
+            fi
+
+            # Navigate to deployment directory
             sudo mkdir -p /var/www/react-app
             sudo chown -R $USER:$USER /var/www/react-app
             cd /var/www/react-app || git clone https://github.com/your-username/your-repo.git . && cd /var/www/react-app
@@ -57,10 +64,4 @@ jobs:
             # Stop existing app if running
             pm2 stop react-app || true
 
-            # Serve the React app in production mode
-            pm2 start "serve -s build -l 80" --name react-app
-
-            # Ensure app auto-starts on reboot
-            pm2 save
-            pm2 startup | sudo tee /etc/systemd/system/pm2-user.service
-          EOF
+    
