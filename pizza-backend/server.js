@@ -3,18 +3,27 @@ const mysql = require("mysql");
 const cors = require("cors");
 require("dotenv").config();
 <<<<<<< HEAD
+<<<<<<< HEAD
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 =======
 const path = require('path');
 >>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
+=======
+const path = require("path");
+const multer = require("multer");
+const fs = require("fs");
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 // Ensure "images" folder exists
 const imageDir = path.join(__dirname, "images");
 if (!fs.existsSync(imageDir)) {
@@ -49,8 +58,11 @@ const upload = multer({
   },
 }).single("image"); // Expect a single image in the "image" field
 
+<<<<<<< HEAD
 =======
 >>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
+=======
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 // Connect to MySQL Database
 const db = mysql.createConnection({
   host: "localhost",
@@ -68,6 +80,7 @@ db.connect((err) => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Serve static images from the "images" folder
 app.use("/images", express.static(imageDir));
 =======
@@ -75,6 +88,10 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 
 >>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
+=======
+// Serve static images from the "images" folder
+app.use("/images", express.static(imageDir));
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 
 // API to Fetch Users
 app.get("/users", (req, res) => {
@@ -87,9 +104,13 @@ app.get("/users", (req, res) => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // API to Fetch Pizzas
 =======
 >>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
+=======
+// API to Fetch Pizzas
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 app.get("/menu", (req, res) => {
   db.query("SELECT * FROM pizzas", (err, result) => {
     if (err) {
@@ -100,6 +121,7 @@ app.get("/menu", (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 // API to Fetch Sides
 app.get("/side", (req, res) => {
@@ -114,12 +136,23 @@ app.get("/side", (req, res) => {
       console.error("Error fetching pizza data:", err);
       return res.status(500).send("Error fetching pizza data");
 >>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
+=======
+// API to Fetch Sides
+app.get("/side", (req, res) => {
+  db.query("SELECT * FROM side", (err, result) => {
+    if (err) {
+      console.error("Error fetching side data:", err);
+      return res.status(500).send("Error fetching side data");
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
     }
     res.json(result); // Send the menu data as JSON
   });
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 // API to Fetch Desserts
 app.get("/desserts", (req, res) => {
   db.query("SELECT * FROM desserts", (err, result) => {
@@ -235,10 +268,92 @@ app.post("/add/desserts", upload, (req, res) => {
     res.status(201).send("Dessert added successfully!");
   });
 });
+<<<<<<< HEAD
 =======
 
   
 >>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
+=======
+
+//ORDERS..............
+app.get("/orders", (req, res) => {
+  db.query("SELECT * FROM orders ORDER BY order_date DESC", (err, result) => {
+    if (err) {
+      console.error("Error fetching orders:", err);
+      return res.status(500).json({ message: "Error fetching orders" });
+    }
+    res.json(result);
+  });
+});
+
+app.post("/place-order", (req, res) => {
+  const { cart } = req.body;
+
+  if (!cart || cart.length === 0) {
+    return res.status(400).json({ message: "Cart is empty. Cannot place an order." });
+  }
+
+  const query = `
+    INSERT INTO orders (item_id, category, size, toppings, total_price) 
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  cart.forEach((item) => {
+    const toppingsString = item.toppings && item.toppings.length > 0 ? item.toppings.join(", ") : null;
+
+    db.query(query, [item.item_id, item.category, item.size, toppingsString, item.total_price], (err) => {
+      if (err) {
+        console.error("Error adding order:", err);
+        return res.status(500).json({ message: "Database error while adding order." });
+      }
+    });
+  });
+
+  res.status(201).json({ message: "Order placed successfully!" });
+});
+
+//CHECKOUT.............
+const crypto = require("crypto"); // For unique order IDs
+
+app.post("/checkout", (req, res) => {
+  const cartItems = req.body.cart; // Get cart data from frontend
+
+  if (!cartItems || cartItems.length === 0) {
+    return res.status(400).json({ error: "Cart is empty!" });
+  }
+
+  const query = `
+    INSERT INTO orders (order_id, user_id, item_id, item_name, category, size, quantity, toppings, total_price, status, payment_status, order_date) 
+    VALUES ?`;
+
+  const values = cartItems.map((item) => [
+    crypto.randomUUID().slice(0, 10), // Unique order ID
+    item.user_id || null, // Default to NULL if user_id is not provided
+    item.item_id,
+    item.name, // Store item name
+    item.category || "Unknown",
+    item.size || "None", // Default size to 'None' if not applicable
+    item.quantity || 1, // Default quantity to 1
+    JSON.stringify(item.toppings || []), // Convert toppings array to JSON
+    parseFloat(item.total_price.toFixed(2)), // Ensure total_price is a valid number
+    "Pending", // Default order status
+    "Unpaid", // Default payment status
+    new Date() // Order timestamp
+  ]);
+
+  console.log("📦 Inserting Order Data:", values);
+
+  db.query(query, [values], (err, result) => {
+    if (err) {
+      console.error("❌ Error inserting order:", err);
+      return res.status(500).json({ error: "Database error while inserting order" });
+    }
+    res.status(201).json({ message: "✅ Order placed successfully!" });
+  });
+});
+
+
+>>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 
 // Start Server on Port 5000
 app.listen(5000, () => {

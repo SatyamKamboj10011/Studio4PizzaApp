@@ -1,111 +1,153 @@
-import React from "react";
-import { Navbar, Nav, Container } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { styled } from "@mui/system";
+import { AppBar, Toolbar, IconButton, Typography, Button, Badge, InputBase, Menu, MenuItem } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+
+// Styled components
+const CustomNavbar = styled(AppBar)(({ theme }) => ({
+  background: "rgba(0, 0, 0, 0.85)", // Fixed dark background
+  backdropFilter: "blur(10px)",
+  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
+  transition: "all 0.3s ease-in-out",
+  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+}));
+
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: "20px",
+  backgroundColor: "rgba(255, 255, 255, 0.1)",
+  marginLeft: theme.spacing(2),
+  width: "100%",
+  maxWidth: "300px",
+  display: "flex",
+  alignItems: "center",
+  padding: "0.25rem 0.5rem",
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  color: "white",
+  padding: theme.spacing(0, 1),
+  pointerEvents: "none",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "white",
+  width: "100%",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(2)})`,
+  },
+}));
 
 const NavbarComponent = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [cartItems, setCartItems] = useState(3); // Example cart items count
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const navLinks = [
+    { path: "/pizzas", name: "Pizza" },
+    { path: "/side", name: "Side" },
+    { path: "/dessert", name: "Dessert" },
+    { path: "/drink", name: "Drink" },
+    { path: "/addmenu", name: "Add Menu" },
+    { path: "/checkout", name: "Checkout" },
+  ];
+
   return (
-    <Navbar expand="lg" className="custom-navbar">
-      <Container>
+    <CustomNavbar position="sticky">
+      <Toolbar>
+        {/* Mobile Menu Button */}
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={handleMenuOpen}
+          sx={{ display: { xs: "block", sm: "none" } }}
+        >
+          <MenuIcon />
+        </IconButton>
+
+        {/* Mobile Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+          sx={{ display: { xs: "block", sm: "none" } }}
+        >
+          {navLinks.map((item, index) => (
+            <MenuItem key={index} component={Link} to={item.path} onClick={handleMenuClose}>
+              {item.name}
+            </MenuItem>
+          ))}
+        </Menu>
+
         {/* Brand / Logo */}
-        <Navbar.Brand as={Link} to="/" className="brand-logo">
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          sx={{
+            flexGrow: 1,
+            textDecoration: "none",
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "1.8rem",
+            fontFamily: "'Pacifico', cursive",
+          }}
+        >
           🍕 BestPizza
-        </Navbar.Brand>
+        </Typography>
 
-        {/* Toggle Button for Mobile */}
-        <Navbar.Toggle aria-controls="navbar-nav" />
+        {/* Search Bar */}
+        <Search>
+          <SearchIconWrapper>
+            <SearchIcon />
+          </SearchIconWrapper>
+          <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
+        </Search>
 
-        {/* Collapsible Navigation */}
-        <Navbar.Collapse id="navbar-nav">
-          <Nav className="ms-auto">
-            {[
-              { path: "/pizzas", name: "Pizza" },
-              { path: "/side", name: "Side" },
-              { path: "/dessert", name: "Dessert" },
-              { path: "/drink", name: "Drink" },
-              { path: "/checkout", name: "Checkout" },
-            ].map((item, index) => (
-              <Nav.Link key={index} as={Link} to={item.path} className="nav-link-custom">
-                {item.name}
-              </Nav.Link>
-            ))}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
+        {/* Navigation Links */}
+        <div sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+          {navLinks.map((item, index) => (
+            <Button
+              key={index}
+              component={Link}
+              to={item.path}
+              sx={{
+                color: "white",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                mx: 1,
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
+                  color: "#ffd700",
+                  transform: "translateY(-2px)",
+                },
+              }}
+            >
+              {item.name}
+            </Button>
+          ))}
+        </div>
 
-      {/* Ultimate CSS Magic ✨ */}
-      <style>
-        {`
-          /* --------------------- */
-          /* 🌟 Navbar Styling 🌟 */
-          /* --------------------- */
-
-          .custom-navbar {
-            background: linear-gradient(90deg, #ff416c, #ff4b2b);
-            padding: 15px 0;
-            transition: all 0.3s ease-in-out;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0px 4px 15px rgba(255, 64, 91, 0.5);
-          }
-
-          /* 🍕 Brand Logo */
-          .brand-logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #fff !important;
-            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
-            transition: transform 0.3s ease-in-out;
-          }
-
-          .brand-logo:hover {
-            transform: scale(1.1);
-          }
-
-          /* 🌈 Navbar Links */
-          .nav-link-custom {
-            position: relative;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white !important;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0 15px;
-            transition: all 0.3s ease-in-out;
-          }
-
-          /* 🛸 Neon Hover Effect */
-          .nav-link-custom::before {
-            content: "";
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            width: 0;
-            height: 3px;
-            background: white;
-            box-shadow: 0px 0px 8px white;
-            transition: all 0.4s ease-in-out;
-            transform: translateX(-50%);
-          }
-
-          .nav-link-custom:hover::before {
-            width: 100%;
-          }
-
-          .nav-link-custom:hover {
-            color: #ffd700 !important;
-            text-shadow: 0px 0px 8px #ffd700;
-          }
-
-          /* 🎇 Glow Effect on Scroll */
-          .custom-navbar.scrolled {
-            background: rgba(0, 0, 0, 0.9);
-            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
-          }
-        `}
-      </style>
-    </Navbar>
+        {/* Cart Icon */}
+        <IconButton component={Link} to="/cart" color="inherit" sx={{ ml: 2 }}>
+          <Badge badgeContent={cartItems} color="error">
+            <ShoppingCartIcon />
+          </Badge>
+        </IconButton>
+      </Toolbar>
+    </CustomNavbar>
   );
 };
 
