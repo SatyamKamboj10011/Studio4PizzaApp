@@ -2,14 +2,19 @@ const express = require("express");
 const mysql = require("mysql");
 const cors = require("cors");
 require("dotenv").config();
+<<<<<<< HEAD
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
+=======
+const path = require('path');
+>>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+<<<<<<< HEAD
 // Ensure "images" folder exists
 const imageDir = path.join(__dirname, "images");
 if (!fs.existsSync(imageDir)) {
@@ -44,6 +49,8 @@ const upload = multer({
   },
 }).single("image"); // Expect a single image in the "image" field
 
+=======
+>>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
 // Connect to MySQL Database
 const db = mysql.createConnection({
   host: "localhost",
@@ -60,8 +67,14 @@ db.connect((err) => {
   }
 });
 
+<<<<<<< HEAD
 // Serve static images from the "images" folder
 app.use("/images", express.static(imageDir));
+=======
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+
+>>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
 
 // API to Fetch Users
 app.get("/users", (req, res) => {
@@ -73,7 +86,10 @@ app.get("/users", (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 // API to Fetch Pizzas
+=======
+>>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
 app.get("/menu", (req, res) => {
   db.query("SELECT * FROM pizzas", (err, result) => {
     if (err) {
@@ -84,17 +100,26 @@ app.get("/menu", (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 // API to Fetch Sides
 app.get("/side", (req, res) => {
   db.query("SELECT * FROM side", (err, result) => {
     if (err) {
       console.error("Error fetching side data:", err);
       return res.status(500).send("Error fetching side data");
+=======
+app.get("/side", (req, res) => {
+  db.query("SELECT * FROM side", (err, result) => {
+    if (err) {
+      console.error("Error fetching pizza data:", err);
+      return res.status(500).send("Error fetching pizza data");
+>>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
     }
     res.json(result); // Send the menu data as JSON
   });
 });
 
+<<<<<<< HEAD
 // API to Fetch Desserts
 app.get("/desserts", (req, res) => {
   db.query("SELECT * FROM desserts", (err, result) => {
@@ -210,6 +235,10 @@ app.post("/add/desserts", upload, (req, res) => {
     res.status(201).send("Dessert added successfully!");
   });
 });
+=======
+
+  
+>>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
 
 // Start Server on Port 5000
 app.listen(5000, () => {
