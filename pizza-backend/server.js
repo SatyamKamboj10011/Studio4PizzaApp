@@ -2,28 +2,14 @@ const express = require("express");
 const mysql = require("mysql");
 const cors = require("cors");
 require("dotenv").config();
-<<<<<<< HEAD
-<<<<<<< HEAD
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
-=======
-const path = require('path');
->>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
-=======
-const path = require("path");
-const multer = require("multer");
-const fs = require("fs");
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 // Ensure "images" folder exists
 const imageDir = path.join(__dirname, "images");
 if (!fs.existsSync(imageDir)) {
@@ -58,11 +44,6 @@ const upload = multer({
   },
 }).single("image"); // Expect a single image in the "image" field
 
-<<<<<<< HEAD
-=======
->>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
-=======
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 // Connect to MySQL Database
 const db = mysql.createConnection({
   host: "localhost",
@@ -79,19 +60,8 @@ db.connect((err) => {
   }
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 // Serve static images from the "images" folder
 app.use("/images", express.static(imageDir));
-=======
-app.use("/images", express.static(path.join(__dirname, "images")));
-
-
->>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
-=======
-// Serve static images from the "images" folder
-app.use("/images", express.static(imageDir));
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 
 // API to Fetch Users
 app.get("/users", (req, res) => {
@@ -103,14 +73,7 @@ app.get("/users", (req, res) => {
   });
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 // API to Fetch Pizzas
-=======
->>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
-=======
-// API to Fetch Pizzas
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 app.get("/menu", (req, res) => {
   db.query("SELECT * FROM pizzas", (err, result) => {
     if (err) {
@@ -121,38 +84,17 @@ app.get("/menu", (req, res) => {
   });
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 // API to Fetch Sides
 app.get("/side", (req, res) => {
   db.query("SELECT * FROM side", (err, result) => {
     if (err) {
       console.error("Error fetching side data:", err);
       return res.status(500).send("Error fetching side data");
-=======
-app.get("/side", (req, res) => {
-  db.query("SELECT * FROM side", (err, result) => {
-    if (err) {
-      console.error("Error fetching pizza data:", err);
-      return res.status(500).send("Error fetching pizza data");
->>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
-=======
-// API to Fetch Sides
-app.get("/side", (req, res) => {
-  db.query("SELECT * FROM side", (err, result) => {
-    if (err) {
-      console.error("Error fetching side data:", err);
-      return res.status(500).send("Error fetching side data");
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
     }
     res.json(result); // Send the menu data as JSON
   });
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 // API to Fetch Desserts
 app.get("/desserts", (req, res) => {
   db.query("SELECT * FROM desserts", (err, result) => {
@@ -268,12 +210,6 @@ app.post("/add/desserts", upload, (req, res) => {
     res.status(201).send("Dessert added successfully!");
   });
 });
-<<<<<<< HEAD
-=======
-
-  
->>>>>>> a5d554d945a1bdb1faa6923e431be4ab7d9094c9
-=======
 
 //ORDERS..............
 app.get("/orders", (req, res) => {
@@ -353,7 +289,6 @@ app.post("/checkout", (req, res) => {
 });
 
 
->>>>>>> ff0af5f53605ea50d12bcbc9609006c23d17500b
 
 // Start Server on Port 5000
 app.listen(5000, () => {
