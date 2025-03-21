@@ -13,6 +13,7 @@ import Login from "./Login";
 import Footer from "./Footer";
 import CartPage from "./Cart";
 import Invoice from "./Invoice";
+import Checkout from "./Checkout";
 
 function App() {
   return (
@@ -32,6 +33,8 @@ function App() {
         <Route path="/contact" element={<ContactUs/>}/>
         <Route path="/cart" element={<CartPage/>}/>
         <Route path="/invoice" element={<Invoice/>}/>
+        <Route path="/checkout" element={<Checkout/>}/>
+        
         {/* <Route path="/checkout" element={<Checkout />} /> */}
       </Routes>
     <Footer/>
