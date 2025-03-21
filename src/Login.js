@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, FaSpinner } from 'react-icons/fa';
 
 // Background video or image
-import pizzaVideo from './pizza.mp4'; // Add a pizza video or image to your src folder
-//import logo from './logo.png'; // Add your logo to the src folder
+import pizzaVideo from './pizza.mp4';
+// import logo from './logo.png';
 
 // Keyframes for animations
 const fadeIn = keyframes`
@@ -79,7 +79,7 @@ const InputContainer = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 3rem; /* Adjusted padding for icons */
+  padding: 0.75rem 2.5rem 0.75rem 3rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   font-size: 1rem;
@@ -277,7 +277,7 @@ const Login = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-     {/* <Logo src={logo} alt="Pizza Heaven Logo" /> */}
+        {/* <Logo src={logo} alt="Pizza Heaven Logo" /> */}
         <Title>Slice & Dice</Title>
 
         <InputContainer>
@@ -330,7 +330,7 @@ const Login = () => {
         {message.text && <Message error={message.error}>{message.text}</Message>}
 
         <Button type="submit" disabled={loading}>
-          {loading ? <><FaSpinner /> Logging in...</> : 'Login'}
+          {loading ? <><Spinner /> Logging in...</> : 'Login'}
         </Button>
 
         <SocialLogin>
@@ -346,8 +346,11 @@ const Login = () => {
         </SocialLogin>
 
         <Footer>
-          By logging in, you agree to our <a href="#">Terms of Service</a> and{' '}
-          <a href="#">Privacy Policy</a>.
+          By logging in, you agree to our <Link href="#">Terms of Service</Link> and{' '}
+          <Link href="#">Privacy Policy</Link>.
+          <div style={{ marginTop: '1rem' }}>
+            Don't have an account? <Link href="/Registration">Sign Up</Link>
+          </div>
         </Footer>
       </LoginForm>
     </LoginContainer>
