@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col, Card, Button, Image } from "react-bootstrap";
-import { FaHeart, FaUsers, FaAward, FaPizzaSlice, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { FaHeart, FaUsers, FaAward, FaPizzaSlice, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const AboutUs = () => {
