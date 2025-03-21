@@ -4,7 +4,7 @@ import Pizza from "./Pizza";
 import Home from "./Home";
 import Drink from "./Drink";
 import SideMenu from "./Side";
-import Navbar from "./Navbar"; // Import the Navbar component
+import Navbar from "./Navbar";
 import DessertMenu from "./Dessert";
 import AddMenuPage from "./AddMenu";
 import AboutUs from "./Aboutus";
@@ -17,11 +17,9 @@ import UserDashboard from"./UserDashboard";
 function App() {
   return (
     <Router>
-      {/* Include the Navbar component here */}
       <Navbar />
-
       <Routes>
-      <Route path="/home" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/pizzas" element={<Pizza />} />
         <Route path="/" element={<Login />} />
         <Route path="/drink" element={<Drink />} />
@@ -34,7 +32,7 @@ function App() {
         <Route path="/userdashboard" element={<UserDashboard/>}/>
         {/* <Route path="/checkout" element={<Checkout />} /> */}
       </Routes>
-    <Footer/>
+      <Footer />
     </Router>
   );
 }
