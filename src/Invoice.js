@@ -27,8 +27,7 @@ const Invoice = () => {
     let yPosition = 40;
     doc.text(`Customer Name: ${customer.name || "N/A"}`, 20, yPosition);
     yPosition += 10;
-    doc.text(`Email: ${customer.email || "N/A"}`, 20, yPosition);
-    yPosition += 10;
+  
     doc.text(`Phone: ${customer.phone || "N/A"}`, 20, yPosition);
     yPosition += 10;
     doc.text("Order Summary:", 20, yPosition);
@@ -115,7 +114,7 @@ const Invoice = () => {
         <h2 style={styles.title}>Invoice</h2>
         <div style={styles.customerInfo}>
           <p><strong>Customer:</strong> {customer.name || "N/A"}</p>
-          <p><strong>Email:</strong> {customer.email || "N/A"}</p>
+  
           <p><strong>Phone:</strong> {customer.phone || "N/A"}</p>
         </div>
 
