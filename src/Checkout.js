@@ -2,10 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaUser, FaHome, FaPhone, FaMoneyBillWave } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Checkout = () => {
-  const [cart, setCart] = useState([]);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { cart } = location.state || { cart: [] }; // Get cart data from state
+
   const [totalPrice, setTotalPrice] = useState(0);
   const [formData, setFormData] = useState({
     name: "",
@@ -17,14 +22,11 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(savedCart);
-    const total = savedCart.reduce((sum, item) => sum + item.totalPrice, 0);
+    // Calculate total price from cart
+    const total = cart.reduce((sum, item) => sum + (item.total_price || 0), 0);
     setTotalPrice(total);
-  }, []);
+  }, [cart]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,7 +46,6 @@ const Checkout = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     setShowConfirmation(true);
   };
 
@@ -52,17 +53,12 @@ const Checkout = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      alert("Order placed successfully! 🎉");
-
-      const customerData = {
-        ...formData,
-        email: formData.email || "",
-      };
-
+      toast.success("✅ Order placed successfully!");
       localStorage.removeItem("cart");
 
+      // Navigate to the invoice page with cart and customer data
       navigate("/invoice", {
-        state: { cart, customer: customerData },
+        state: { cart, customer: formData },
       });
     }, 2000); // Simulate a 2-second delay for order processing
   };
@@ -80,10 +76,7 @@ const Checkout = () => {
                 cart.map((item, index) => (
                   <div key={index} style={styles.orderItem}>
                     <p>
-                      {item.quantity} x{" "}
-                      {item.pizza?.name || item.side?.name || item.dessert?.name || item.drink?.name} (
-                      {item.size}) -{" "}
-                      <span style={styles.itemPrice}>${item.totalPrice.toFixed(2)}</span>
+                      {item.name} - ${item.total_price?.toFixed(2)}
                     </p>
                   </div>
                 ))

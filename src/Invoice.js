@@ -6,7 +6,16 @@ import { useLocation } from "react-router-dom";
 
 const Invoice = () => {
   const location = useLocation();
-  const { cart = [], customer = {} } = location.state || { cart: [], customer: {} };
+  const { cart = [], customer = {} } = location.state || {};
+
+  // Ensure cart items have a default structure
+  const safeCart = cart.map((item) => ({
+    ...item,
+    total_price: item.total_price || 0, // Default to 0 if total_price is undefined
+    name: item.name || "Unknown Item", // Default name if undefined
+    size: item.size || "Unknown Size", // Default size if undefined
+    quantity: item.quantity || 1, // Default quantity if undefined
+  }));
 
   // Function to generate and download PDF
   const generatePDF = () => {
@@ -25,16 +34,16 @@ const Invoice = () => {
     doc.text("Order Summary:", 20, yPosition);
     yPosition += 10;
 
-    cart.forEach((item, index) => {
+    safeCart.forEach((item, index) => {
       doc.text(
-        `${index + 1}. ${item.quantity} x ${item.pizza} (${item.size}) - $${item.totalPrice.toFixed(2)}`,
+        `${index + 1}. ${item.quantity} x ${item.name} (${item.size}) - $${item.total_price.toFixed(2)}`,
         20,
         yPosition
       );
       yPosition += 10;
     });
 
-    const subtotal = cart.reduce((acc, item) => acc + item.totalPrice, 0);
+    const subtotal = safeCart.reduce((acc, item) => acc + item.total_price, 0);
     const tax = subtotal * 0.08; // 8% Tax
     const total = subtotal + tax;
 
@@ -114,21 +123,21 @@ const Invoice = () => {
           <thead>
             <tr style={{ backgroundColor: "#FFA500", color: "white" }}>
               <th>#</th>
-              <th>Pizza</th>
+              <th>Item</th>
               <th>Size</th>
               <th>Quantity</th>
               <th>Price</th>
             </tr>
           </thead>
           <tbody>
-            {cart.length > 0 ? (
-              cart.map((item, index) => (
+            {safeCart.length > 0 ? (
+              safeCart.map((item, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
-                  <td>{item.pizza}</td>
+                  <td>{item.name}</td>
                   <td>{item.size}</td>
                   <td>{item.quantity}</td>
-                  <td>${item.totalPrice.toFixed(2)}</td>
+                  <td>${item.total_price.toFixed(2)}</td>
                 </tr>
               ))
             ) : (
@@ -143,7 +152,7 @@ const Invoice = () => {
 
         <h4 style={styles.totalPrice}>
           Total: $
-          {cart.reduce((acc, item) => acc + item.totalPrice, 0).toFixed(2)}
+          {safeCart.reduce((acc, item) => acc + item.total_price, 0).toFixed(2)}
         </h4>
 
         <div style={styles.buttonContainer}>

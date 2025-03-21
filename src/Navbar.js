@@ -44,7 +44,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const NavbarComponent = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [cartItems, setCartItems] = useState(3); // Example cart items count
+  const [cartItems, setCartItems] = useState(); // Example cart items count
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);

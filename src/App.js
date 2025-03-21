@@ -22,22 +22,21 @@ function App() {
       <Navbar />
 
       <Routes>
-      <Route path="/home" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/pizzas" element={<Pizza />} />
         <Route path="/" element={<Login />} />
         <Route path="/drink" element={<Drink />} />
         <Route path="/side" element={<SideMenu />} />
         <Route path="/dessert" element={<DessertMenu />} />
-        <Route path="/addmenu" element={<AddMenuPage/>}/>
-        <Route path="/aboutus" element={<AboutUs/>}/>
-        <Route path="/contact" element={<ContactUs/>}/>
-        <Route path="/cart" element={<CartPage/>}/>
-        <Route path="/invoice" element={<Invoice/>}/>
-        <Route path="/checkout" element={<Checkout/>}/>
-        
-        {/* <Route path="/checkout" element={<Checkout />} /> */}
+        <Route path="/addmenu" element={<AddMenuPage />} />
+        <Route path="/aboutus" element={<AboutUs />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/invoice" element={<Invoice />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
-    <Footer/>
+
+      <Footer />
     </Router>
   );
 }
