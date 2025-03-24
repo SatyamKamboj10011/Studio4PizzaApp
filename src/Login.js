@@ -1,4 +1,3 @@
-// src/Login.js
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
@@ -6,7 +5,6 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, F
 
 // Background video or image
 import pizzaVideo from './pizza.mp4';
-// import logo from './logo.png';
 
 // Keyframes for animations
 const fadeIn = keyframes`
@@ -57,12 +55,6 @@ const LoginForm = styled(motion.form)`
   max-width: 400px;
   text-align: center;
   animation: ${fadeIn} 1s ease-in-out;
-`;
-
-const Logo = styled.img`
-  width: 80px;
-  height: 80px;
-  margin-bottom: 1rem;
 `;
 
 const Title = styled.h2`
@@ -247,13 +239,15 @@ const Login = () => {
 
     // Simulate login API call
     setTimeout(() => {
-      if (email === 'test@example.com' && password === 'password123') {
-        setMessage({ text: 'Login successful!', error: false });
-      } else {
-        setMessage({ text: 'Invalid email or password.', error: true });
-      }
+      // Bypass validation and redirect to pizza page
+      setMessage({ text: 'Login successful! Redirecting...', error: false });
       setLoading(false);
-    }, 2000);
+
+      // Redirect to the pizza page after a short delay
+      setTimeout(() => {
+        window.location.href = '/pizzas'; // Replace with your pizza page URL
+      }, 1000); // 1 second delay before redirecting
+    }, 2000); // Simulate a 2-second API call
   };
 
   const calculatePasswordStrength = (password) => {
@@ -277,7 +271,6 @@ const Login = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* <Logo src={logo} alt="Pizza Heaven Logo" /> */}
         <Title>Slice & Dice</Title>
 
         <InputContainer>

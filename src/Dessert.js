@@ -18,9 +18,9 @@ import {
 import { AddShoppingCart } from "@mui/icons-material";
 import MuiAlert from "@mui/material/Alert";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
 
 const DessertMenu = () => {
   const [desserts, setDesserts] = useState([]);
@@ -33,12 +33,8 @@ const DessertMenu = () => {
   useEffect(() => {
     axios
       .get("http://localhost:5000/desserts")
-      .then((response) => {
-        setDesserts(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching desserts:", error);
-      });
+      .then((response) => setDesserts(response.data))
+      .catch((error) => console.error("Error fetching desserts:", error));
   }, []);
 
   const addToCart = (dessert) => {
@@ -47,13 +43,16 @@ const DessertMenu = () => {
     setOpenSnackbar(true);
   };
 
-  const sortedDesserts = [...desserts];
+  const sortedDesserts = [...desserts].filter(
+    (dessert) => dessert.name && dessert.price !== undefined
+  );
+
   if (sortOption === "alphabetically") {
-    sortedDesserts.sort((a, b) => a.name.localeCompare(b.name));
+    sortedDesserts.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   } else if (sortOption === "priceLowToHigh") {
-    sortedDesserts.sort((a, b) => a.price - b.price);
+    sortedDesserts.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
   } else if (sortOption === "priceHighToLow") {
-    sortedDesserts.sort((a, b) => b.price - a.price);
+    sortedDesserts.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
   }
 
   const filteredDesserts =
