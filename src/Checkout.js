@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Container, Row, Col, Card, Button, Form, Modal, Spinner } from "react-bootstrap";
 import { FaUser, FaHome, FaPhone, FaMoneyBillWave } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cart } = location.state || { cart: [] }; // Get cart data from state
+  const { cart } = location.state || { cart: [] };
 
   const [totalPrice, setTotalPrice] = useState(0);
   const [formData, setFormData] = useState({
@@ -23,7 +23,6 @@ const Checkout = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Calculate total price from cart
     const total = cart.reduce((sum, item) => sum + (item.total_price || 0), 0);
     setTotalPrice(total);
   }, [cart]);
@@ -31,14 +30,14 @@ const Checkout = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: "" }); // Clear error on input change
+    setErrors({ ...errors, [name]: "" });
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    if (!formData.name.trim()) newErrors.name = "Please enter your name.";
+    if (!formData.address.trim()) newErrors.address = "Please enter your delivery address.";
+    if (!formData.phone.trim()) newErrors.phone = "Please enter your contact number.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -53,112 +52,103 @@ const Checkout = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      toast.success("✅ Order placed successfully!");
+      toast.success("✅ Order placed successfully!", { position: "bottom-right" });
       localStorage.removeItem("cart");
-
-      // Navigate to the invoice page with cart and customer data
       navigate("/invoice", {
         state: { cart, customer: formData },
       });
-    }, 2000); // Simulate a 2-second delay for order processing
+    }, 2000);
   };
 
   return (
-    <Container fluid style={styles.container}>
-      <h1 style={styles.title}>Checkout</h1>
+    <Container style={styles.container}>
+      <ToastContainer />
+      <h2 className="text-center mb-4 fw-bold" style={{ fontFamily: "Poppins, sans-serif" }}>
+        Checkout
+      </h2>
+
       <Row>
         {/* Order Summary */}
-        <Col md={7}>
-          <Card style={styles.orderCard}>
+        <Col lg={7} className="mb-4">
+          <Card className="shadow-sm">
             <Card.Body>
-              <Card.Title style={styles.cardTitle}>🛒 Order Summary</Card.Title>
+              <h4 className="mb-3 fw-bold">🛒 Order Summary</h4>
               {cart.length > 0 ? (
-                cart.map((item, index) => (
-                  <div key={index} style={styles.orderItem}>
-                    <p>
-                      {item.name} - ${item.total_price?.toFixed(2)}
+                cart.map((item, idx) => (
+                  <div key={idx} style={styles.orderItem}>
+                    <p className="mb-2">
+                      {item.name} <span className="text-muted">- ${item.total_price?.toFixed(2)}</span>
                     </p>
                   </div>
                 ))
               ) : (
-                <p style={styles.emptyCartMessage}>Your cart is empty. 🛍️</p>
+                <p className="text-muted">Your cart is currently empty. 🛍️</p>
               )}
-              <hr style={styles.divider} />
-              <h4 style={styles.totalPrice}>Total: ${totalPrice.toFixed(2)}</h4>
+              <hr />
+              <h5 className="text-end fw-bold">Total: ${totalPrice.toFixed(2)}</h5>
             </Card.Body>
           </Card>
         </Col>
 
-        {/* Payment and Delivery Details */}
-        <Col md={5}>
-          <Card style={styles.paymentCard}>
+        {/* Payment & Delivery */}
+        <Col lg={5}>
+          <Card className="shadow-sm">
             <Card.Body>
-              <Card.Title style={styles.cardTitle}>💳 Payment & Delivery</Card.Title>
+              <h4 className="mb-3 fw-bold">💳 Payment & Delivery</h4>
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
-                  <Form.Label style={styles.label}>
-                    <FaUser style={styles.icon} /> Full Name
+                  <Form.Label>
+                    <FaUser className="me-2" /> Name
                   </Form.Label>
                   <Form.Control
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    required
-                    style={styles.input}
                     isInvalid={!!errors.name}
+                    placeholder="Your full name"
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.name}
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label style={styles.label}>
-                    <FaHome style={styles.icon} /> Address
+                  <Form.Label>
+                    <FaHome className="me-2" /> Address
                   </Form.Label>
                   <Form.Control
                     type="text"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    required
-                    style={styles.input}
                     isInvalid={!!errors.address}
+                    placeholder="Delivery address"
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.address}
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">{errors.address}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label style={styles.label}>
-                    <FaPhone style={styles.icon} /> Phone Number
+                  <Form.Label>
+                    <FaPhone className="me-2" /> Phone
                   </Form.Label>
                   <Form.Control
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    required
-                    style={styles.input}
                     isInvalid={!!errors.phone}
+                    placeholder="e.g., 0211234567"
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.phone}
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group className="mb-3">
-                  <Form.Label style={styles.label}>
-                    <FaMoneyBillWave style={styles.icon} /> Payment Method
+                <Form.Group className="mb-4">
+                  <Form.Label>
+                    <FaMoneyBillWave className="me-2" /> Payment Method
                   </Form.Label>
                   <Form.Select
                     name="paymentMethod"
                     value={formData.paymentMethod}
                     onChange={handleInputChange}
-                    required
-                    style={styles.input}
                   >
                     <option value="creditCard">💳 Credit Card</option>
                     <option value="debitCard">🏦 Debit Card</option>
@@ -167,8 +157,20 @@ const Checkout = () => {
                   </Form.Select>
                 </Form.Group>
 
-                <Button type="submit" style={styles.submitButton} disabled={isLoading}>
-                  {isLoading ? "Processing..." : "✅ Place Order"}
+                <Button
+                  type="submit"
+                  className="w-100"
+                  style={{ backgroundColor: "#ff6347", border: "none", fontWeight: "600" }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Spinner animation="border" size="sm" className="me-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    "✅ Place Order"
+                  )}
                 </Button>
               </Form>
             </Card.Body>
@@ -176,20 +178,18 @@ const Checkout = () => {
         </Col>
       </Row>
 
-      {/* Confirmation Modal */}
-      <Modal show={showConfirmation} onHide={() => setShowConfirmation(false)}>
+      {/* Modal for Confirmation */}
+      <Modal show={showConfirmation} onHide={() => setShowConfirmation(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Order</Modal.Title>
+          <Modal.Title>Confirm Your Order</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to place this order?
-        </Modal.Body>
+        <Modal.Body>Are you sure you want to place this order?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowConfirmation(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={confirmOrder}>
-            Confirm
+          <Button variant="success" onClick={confirmOrder}>
+            Yes, Place Order
           </Button>
         </Modal.Footer>
       </Modal>
@@ -197,100 +197,16 @@ const Checkout = () => {
   );
 };
 
-// 🎨 Styling
+// Styles
 const styles = {
   container: {
     maxWidth: "1100px",
-    margin: "40px auto",
-    padding: "20px",
-    background: "linear-gradient(to right, #FFEFBA, #FFFFFF)",
-    borderRadius: "12px",
-    boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-  },
-  title: {
-    textAlign: "center",
-    fontSize: "2.8rem",
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: "30px",
-    fontFamily: "Poppins, sans-serif",
-  },
-  orderCard: {
-    borderRadius: "15px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-    backgroundColor: "#ffffff",
-    padding: "20px",
-  },
-  paymentCard: {
-    borderRadius: "15px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-    backgroundColor: "#f9f9f9",
-    padding: "20px",
-  },
-  cardTitle: {
-    fontSize: "1.8rem",
-    fontWeight: "bold",
-    color: "#444",
-    marginBottom: "20px",
-    textAlign: "center",
-    fontFamily: "Poppins, sans-serif",
+    marginTop: "40px",
+    marginBottom: "60px",
   },
   orderItem: {
-    fontSize: "1.2rem",
-    color: "#555",
-    marginBottom: "12px",
-    fontFamily: "Arial, sans-serif",
-  },
-  itemPrice: {
-    fontWeight: "bold",
-    color: "#FF6347",
-  },
-  emptyCartMessage: {
-    fontSize: "1.3rem",
-    color: "#777",
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-  divider: {
-    borderTop: "2px solid #ddd",
-  },
-  totalPrice: {
-    fontSize: "1.7rem",
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "right",
-  },
-  label: {
-    fontSize: "1.2rem",
-    fontWeight: "bold",
-    color: "#333",
-    fontFamily: "Poppins, sans-serif",
-  },
-  input: {
-    borderRadius: "8px",
-    border: "1px solid #ddd",
-    padding: "12px",
-    fontSize: "1.1rem",
-    width: "100%",
-    backgroundColor: "#f8f9fa",
-  },
-  submitButton: {
-    backgroundColor: "#FF6347",
-    border: "none",
-    borderRadius: "10px",
-    padding: "14px",
-    fontSize: "1.2rem",
-    fontWeight: "bold",
-    transition: "background-color 0.3s ease",
-    width: "100%",
-    color: "white",
-    fontFamily: "Poppins, sans-serif",
-    ":hover": {
-      backgroundColor: "#e5533d",
-    },
-  },
-  icon: {
-    marginRight: "8px",
+    padding: "10px 0",
+    borderBottom: "1px solid #eee",
   },
 };
 
