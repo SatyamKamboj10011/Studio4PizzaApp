@@ -3,74 +3,74 @@ name: Deploy React App to Apache Server
 on:
   push:
     branches:
-      - main  # Change this if using a different branch
+      - main  # Change this to your target branch if needed
 
 jobs:
   deploy:
+    name: 🚀 Deploy to Apache Server
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install SSH & SSHPass
+      - name: 🔧 Install SSH & SSHPass
         run: sudo apt-get install -y sshpass
 
-      - name: Debug SSH Variables
-        run: |
-          echo "Server Host: ${{ secrets.SERVER_HOST }}"
-          echo "Server Username: ${{ secrets.SERVER_USERNAME }}"
-
-      - name: Install Node.js Dependencies & Build React App
+      - name: 📦 Install Dependencies & Build React App
         run: |
           export CI=false  # Prevent ESLint warnings from failing the build
           npm install
           npm run build
 
-      - name: Transfer Files to Apache Server
+      - name: 🚚 Transfer Files to Apache Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
+          echo "Connecting to $SERVER_HOST..."
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            echo "✅ Successfully connected to $SERVER_HOST"
-
-            # Clear old files and upload new ones
+            echo "✅ Connected to server. Cleaning old files..."
             sudo rm -rf /var/www/html/*
             exit
           EOF
-          
+
+          echo "📤 Uploading new build files..."
           sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
 
+      # - name: 🔁 (Optional) Restart Apache Server
+      #   if: always()
+      #   env:
+      #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      #     SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+      #     SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+      #   run: |
+      #     sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+      #       echo "🔁 Restarting Apache..."
+      #       sudo systemctl restart apache2
+      #       exit
+      #     EOF
 
-      zap-scan:
+  zap-scan:
+    name: 🛡️ OWASP ZAP Security Scan
     runs-on: ubuntu-latest
+    needs: deploy  # Waits for deploy job to finish
 
     steps:
-      - name: Debug Environment
+      - name: 🖥️ Debug Environment Info
         run: |
-          echo "Operating System: $(uname -a)"
+          echo "OS Info: $(uname -a)"
           echo "Runner Version: $RUNNER_VERSION"
 
-      - name: Install Docker
+      - name: 🐳 Install Docker
         run: |
           curl -fsSL https://get.docker.com -o get-docker.sh
           sudo sh get-docker.sh
           docker --version
 
-      - name: Run OWASP ZAP Full Scan
+      - name: 🔎 Run OWASP ZAP Full Scan
         run: |
           docker pull zaproxy/zap-stable
-          docker run -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-full-scan.py -t http://${{ secrets.SERVER_HOST }}/ -a -I
-
-     # - name: Restart Apache Server
-       # env:
-       #   SERVER_HOST: ${{ secrets.SERVER_HOST }}
-         # SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-        #  SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
-       # run: |
-         # sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-          #  echo "✅ Restarting Apache..."
-          #  sudo systemctl restart apache2
-       #   EOF
+          docker run -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-full-scan.py \
+            -t http://${{ secrets.SERVER_HOST }}/ -a -I
