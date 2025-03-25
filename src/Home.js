@@ -189,24 +189,25 @@ const Home = () => {
   return (
     <Container fluid className="p-0">
       {/* Hero Carousel */}
-      <Carousel fade indicators={false} controls={false} interval={5000}>
-        {heroSlides.map((slide, index) => (
-          <Carousel.Item key={index}>
-            <div style={{ height: "90vh", backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center", position: "relative" }}>
-              <HeroOverlay />
-              <CarouselCaptionStyled>
-                <HeroTitle>{slide.title}</HeroTitle>
-                <HeroSubtitle>{slide.subtitle}</HeroSubtitle>
-                <Link to="/menu">
-                  <HeroButton>
-                    Order Now <FaShoppingCart className="ms-2" />
-                  </HeroButton>
-                </Link>
-              </CarouselCaptionStyled>
-            </div>
-          </Carousel.Item>
-        ))}
-      </Carousel>
+    {/* Hero Carousel */}
+<Carousel fade indicators={false} controls={false} interval={5000}>
+  {heroSlides.map((slide, index) => (
+    <Carousel.Item key={index}>
+      <div style={{ height: "90vh", backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center", position: "relative" }}>
+        <HeroOverlay />
+        <CarouselCaptionStyled>
+          <HeroTitle>{slide.title}</HeroTitle>
+          <HeroSubtitle>{slide.subtitle}</HeroSubtitle>
+          <Link to="/login">  {/* Changed from "/menu" to "/login" */}
+            <HeroButton>
+              Order Now <FaShoppingCart className="ms-2" />
+            </HeroButton>
+          </Link>
+        </CarouselCaptionStyled>
+      </div>
+    </Carousel.Item>
+  ))}
+</Carousel>
 
       {/* Special Offers */}
       <Container className="py-5">
