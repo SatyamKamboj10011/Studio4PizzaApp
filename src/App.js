@@ -14,6 +14,8 @@ import Footer from "./Footer";
 import CartPage from "./Cart";
 import UserDashboard from"./UserDashboard";
 
+import Register from "./Registration";
+
 function App() {
   return (
     <Router>
@@ -30,6 +32,8 @@ function App() {
         <Route path="/contact" element={<ContactUs/>}/>
         <Route path="/cart" element={<CartPage/>}/>
         <Route path="/userdashboard" element={<UserDashboard/>}/>
+        <Route path="/Registration" element={<Register/>}/>
+<Route path="/login" element={<Login/>}/>
         {/* <Route path="/checkout" element={<Checkout />} /> */}
       </Routes>
       <Footer />
