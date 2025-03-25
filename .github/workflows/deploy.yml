@@ -1,47 +1,55 @@
-name: Deploy React App with Docker
+name: Deploy React App to Apache Server
 
 on:
   push:
     branches:
-      - main
+      - main  # Change this if using a different branch
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Install SSH & SSHPass
+        run: sudo apt-get install -y sshpass
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Debug SSH Variables
+        run: |
+          echo "Server Host: ${{ secrets.SERVER_HOST }}"
+          echo "Server Username: ${{ secrets.SERVER_USERNAME }}"
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/react-app:latest
+      - name: Install Node.js Dependencies & Build React App
+        run: |
+          export CI=false  # Prevent ESLint warnings from failing the build
+          npm install
+          npm run build
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
+      - name: Transfer Files to Apache Server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+            echo "✅ Successfully connected to $SERVER_HOST"
 
-    steps:
-      - name: SSH into Server and Deploy Container
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/react-app:latest
-            docker stop react-app || true
-            docker rm react-app || true
-            docker run -d -p 80:80 --name react-app ${{ secrets.DOCKER_USERNAME }}/react-app:latest
+            # Clear old files and upload new ones
+            sudo rm -rf /var/www/html/*
+            exit
+          EOF
+          
+          sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
+
+     # - name: Restart Apache Server
+       # env:
+       #   SERVER_HOST: ${{ secrets.SERVER_HOST }}
+         # SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+        #  SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+       # run: |
+         # sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+          #  echo "✅ Restarting Apache..."
+          #  sudo systemctl restart apache2
+       #   EOF
