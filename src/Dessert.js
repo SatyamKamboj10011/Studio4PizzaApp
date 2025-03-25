@@ -95,7 +95,7 @@ const DessertMenu = () => {
             <InputLabel>Category</InputLabel>
             <Select value={category} onChange={(e) => setCategory(e.target.value)}>
               <MenuItem value="all">All</MenuItem>
-              <MenuItem value="cakes">Cakes</MenuItem>
+              <MenuItem value="cake">cake</MenuItem>
               <MenuItem value="pastries">Pastries</MenuItem>
               <MenuItem value="icecream">Ice Cream</MenuItem>
             </Select>
