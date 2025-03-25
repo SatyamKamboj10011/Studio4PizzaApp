@@ -6,20 +6,21 @@ import Drink from "./Drink";
 import SideMenu from "./Side";
 import Navbar from "./Navbar";
 import DessertMenu from "./Dessert";
-import Checkout from "./Checkout"; // Import the Checkout component
 
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
+        <Route path="/home" element={<Home />} />
         <Route path="/pizzas" element={<Pizza />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Login />} />
         <Route path="/drink" element={<Drink />} />
         <Route path="/side" element={<SideMenu />} />
         <Route path="/dessert" element={<DessertMenu />} />
-        <Route path="/checkout" element={<Checkout />} /> {/* Add the Checkout route */}
+        {/* <Route path="/checkout" element={<Checkout />} /> */}
       </Routes>
+      <Footer />
     </Router>
   );
 }
