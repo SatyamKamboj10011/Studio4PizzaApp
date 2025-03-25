@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/system";
 import { AppBar, Toolbar, IconButton, Typography, Button, Badge, InputBase, Menu, MenuItem } from "@mui/material";
@@ -44,7 +44,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const NavbarComponent = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [cartItems, setCartItems] = useState(3); // Example cart items count
+  const [cartItems, setCartItems] = useState(); // Example cart items count
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -61,6 +61,7 @@ const NavbarComponent = () => {
     { path: "/drink", name: "Drink" },
     { path: "/addmenu", name: "Add Menu" },
     { path: "/checkout", name: "Checkout" },
+    { path: "/", name: "Login" }, // Added Login link
   ];
 
   return (
@@ -95,7 +96,7 @@ const NavbarComponent = () => {
         <Typography
           variant="h6"
           component={Link}
-          to="/"
+          to="/home"
           sx={{
             flexGrow: 1,
             textDecoration: "none",
@@ -117,7 +118,7 @@ const NavbarComponent = () => {
         </Search>
 
         {/* Navigation Links */}
-        <div sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           {navLinks.map((item, index) => (
             <Button
               key={index}
