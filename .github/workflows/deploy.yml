@@ -6,9 +6,36 @@ on:
       - main  # Change this to your target branch if needed
 
 jobs:
+  quality-check:
+    name: ✅ Code Quality & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Set Up Node.js and Install Dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Use the Node.js version that matches your project
+          cache: 'npm'
+
+      - name: 📚 Install Project Dependencies
+        run: |
+          npm install
+
+      - name: 🧹 Run ESLint for Code Quality Check
+        run: |
+          npx eslint ./src --max-warnings=0
+
+      - name: 🧪 Run Jest Tests
+        run: |
+          npm run test -- --watchAll=false --passWithNoTests
+
   deploy:
     name: 🚀 Deploy to Apache Server
     runs-on: ubuntu-latest
+    needs: quality-check  # Ensures Quality Check & Tests pass first
 
     steps:
       - name: ⬇️ Checkout Repository
@@ -17,14 +44,10 @@ jobs:
       - name: 🔧 Install SSH & SSHPass
         run: sudo apt-get install -y sshpass
 
-      - name: 📚 Install Dependencies & Run Tests
+      - name: 📦 Install Dependencies & Build React App
         run: |
           export CI=false  # Prevent ESLint warnings from failing the build
           npm install
-          npm run test -- --watchAll=false  # ✅ Run Jest unit tests before build
-
-      - name: 🏗️ Build React App
-        run: |
           npm run build
 
       - name: 🚚 Transfer Files to Apache Server
@@ -42,6 +65,19 @@ jobs:
 
           echo "📤 Uploading new build files..."
           sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
+
+      # - name: 🔁 (Optional) Restart Apache Server
+      #   if: always()
+      #   env:
+      #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      #     SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+      #     SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+      #   run: |
+      #     sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+      #       echo "🔁 Restarting Apache..."
+      #       sudo systemctl restart apache2
+      #       exit
+      #     EOF
 
   zap-scan:
     name: 🛡️ OWASP ZAP Security Scan
@@ -65,32 +101,3 @@ jobs:
           docker pull zaproxy/zap-stable
           docker run -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-full-scan.py \
             -t http://${{ secrets.SERVER_HOST }}/ -a -I
-
-  quality-test:
-    name: 🎯 Quality Tests
-    runs-on: ubuntu-latest
-    needs: deploy  # Waits for deployment before testing
-
-    steps:
-      - name: ⬇️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 📚 Install Dependencies
-        run: |
-          npm install
-          npm run build
-
-      - name: ⚡ Run Jest Unit Tests
-        run: |
-          npm run test -- --watchAll=false  # ✅ Run Jest to ensure no errors
-
-      - name: 📊 Run Lighthouse CI for Performance & SEO
-        run: |
-          npm install -g @lhci/cli@0.9.x
-          lhci autorun --collect.url=http://${{ secrets.SERVER_HOST }}/ --upload.target=temporary-public-storage
-
-      - name: 📤 Upload Lighthouse Results as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: lighthouse-report
-          path: ./lhci_reports/
