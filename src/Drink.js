@@ -191,7 +191,7 @@ const Drinks = () => {
       <Container sx={{ py: 6 }} maxWidth="lg">
         <Box sx={{ display: "flex", justifyContent: "center", mb: 4, gap: 2 }}>
           <FormControl sx={{ minWidth: 160, backgroundColor: "white", borderRadius: 1 }}>
-            <InputLabel>Category</InputLabel>
+            <InputLabel></InputLabel>
             <Select value={category} onChange={(e) => setCategory(e.target.value)}>
               <MenuItem value="all">All</MenuItem>
               <MenuItem value="cold">Cold Drinks</MenuItem>
@@ -201,7 +201,7 @@ const Drinks = () => {
           </FormControl>
 
           <FormControl sx={{ minWidth: 160, backgroundColor: "white", borderRadius: 1 }}>
-            <InputLabel>Sort By</InputLabel>
+            <InputLabel></InputLabel>
             <Select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
               <MenuItem value="alphabetically">Alphabetically</MenuItem>
               <MenuItem value="priceLowToHigh">Price: Low to High</MenuItem>
