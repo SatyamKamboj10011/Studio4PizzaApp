@@ -37,7 +37,7 @@ const Drinks = () => {
       name: "Neon Nitro Cola",
       price: 4.99,
       category: "cold",
-      image: "neon_cola.jpg",
+      image: "cola.jpeg",
       description: "Glowing carbonated beverage with electric lime flavor"
     },
     {
@@ -45,7 +45,7 @@ const Drinks = () => {
       name: "Quantum Quencher",
       price: 5.49,
       category: "cold",
-      image: "quantum_quencher.jpg",
+      image: "quantum.jpeg",
       description: "Zero-gravity infused ice tea with holographic bubbles"
     },
     {
@@ -53,7 +53,7 @@ const Drinks = () => {
       name: "Solar Flare Latte",
       price: 6.99,
       category: "hot",
-      image: "solar_latte.jpg",
+      image: "latte.jpeg",
       description: "Sun-powered coffee with caramelized stardust topping"
     },
     {
@@ -61,7 +61,7 @@ const Drinks = () => {
       name: "Galactic Gulp",
       price: 7.99,
       category: "alcoholic",
-      image: "galactic_gulp.jpg",
+      image: "gulp.jpeg",
       description: "Vortex vodka with nebula nectar and asteroid ice"
     },
     {
@@ -69,7 +69,7 @@ const Drinks = () => {
       name: "Cyber Citrus Splash",
       price: 4.49,
       category: "cold",
-      image: "cyber_citrus.jpg",
+      image: "splash.jpeg",
       description: "AI-enhanced orange juice with quantum pulp"
     },
     {
@@ -77,7 +77,7 @@ const Drinks = () => {
       name: "Hologram Hot Chocolate",
       price: 6.49,
       category: "hot",
-      image: "holo_chocolate.jpg",
+      image: "hotchocolate.jpeg",
       description: "Projection-mapped cocoa with floating marshmallow clouds"
     },
     {
@@ -85,7 +85,7 @@ const Drinks = () => {
       name: "Plasma Punch",
       price: 8.99,
       category: "alcoholic",
-      image: "plasma_punch.jpg",
+      image: "punch.jpeg",
       description: "Ionized rum with anti-gravity pineapple foam"
     },
     {
@@ -93,7 +93,7 @@ const Drinks = () => {
       name: "Neural Network Nitro",
       price: 5.99,
       category: "cold",
-      image: "neural_nitro.jpg",
+      image: "nitro.jpeg",
       description: "Deep learning-optimized cold brew coffee"
     },
     {
@@ -101,7 +101,7 @@ const Drinks = () => {
       name: "Singularity Soda",
       price: 4.99,
       category: "cold",
-      image: "singularity_soda.jpg",
+      image: "soda.jpeg",
       description: "Black hole-infused cola with infinite fizz"
     },
     {
@@ -109,7 +109,7 @@ const Drinks = () => {
       name: "Warp Core Whiskey",
       price: 9.99,
       category: "alcoholic",
-      image: "warp_whiskey.jpg",
+      image: "whiskey.jpeg",
       description: "Subspace-aged bourbon with dilithium crystals"
     },
     {
@@ -117,7 +117,7 @@ const Drinks = () => {
       name: "Android Affogato",
       price: 7.49,
       category: "hot",
-      image: "android_affogato.jpg",
+      image: "affogato.webp",
       description: "Robotic espresso poured over quantum ice cream"
     },
     {
@@ -125,7 +125,7 @@ const Drinks = () => {
       name: "Photon Frappé",
       price: 6.99,
       category: "cold",
-      image: "photon_frappe.jpg",
+      image: "frappe.jpeg",
       description: "Light-speed blended mocha with laser whipped cream"
     }
   ];
