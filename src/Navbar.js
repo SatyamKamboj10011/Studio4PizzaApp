@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import { AppBar, Toolbar, IconButton, Typography, Button, Badge, InputBase, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useAuth } from "./context/AuthContext";
 
 // Styled components
 const CustomNavbar = styled(AppBar)(({ theme }) => ({
@@ -42,16 +43,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const NavbarComponent = () => {
+const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [cartItems, setCartItems] = useState(3); // Example cart items count
+  const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const handleMenuOpen = (event) => {
+  const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
+  const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   const navLinks = [
@@ -71,7 +79,7 @@ const NavbarComponent = () => {
           edge="start"
           color="inherit"
           aria-label="menu"
-          onClick={handleMenuOpen}
+          onClick={handleMenu}
           sx={{ display: { xs: "block", sm: "none" } }}
         >
           <MenuIcon />
@@ -81,11 +89,11 @@ const NavbarComponent = () => {
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
+          onClose={handleClose}
           sx={{ display: { xs: "block", sm: "none" } }}
         >
           {navLinks.map((item, index) => (
-            <MenuItem key={index} component={Link} to={item.path} onClick={handleMenuClose}>
+            <MenuItem key={index} component={Link} to={item.path} onClick={handleClose}>
               {item.name}
             </MenuItem>
           ))}
@@ -113,7 +121,12 @@ const NavbarComponent = () => {
           <SearchIconWrapper>
             <SearchIcon />
           </SearchIconWrapper>
-          <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
+          <StyledInputBase
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            inputProps={{ 'aria-label': 'search' }}
+          />
         </Search>
 
         {/* Navigation Links */}
@@ -140,15 +153,34 @@ const NavbarComponent = () => {
           ))}
         </div>
 
-        {/* Cart Icon */}
-        <IconButton component={Link} to="/cart" color="inherit" sx={{ ml: 2 }}>
-          <Badge badgeContent={cartItems} color="error">
-            <ShoppingCartIcon />
-          </Badge>
-        </IconButton>
+        {/* Authentication Buttons */}
+        {isAuthenticated ? (
+          <>
+            <Button color="inherit" component={Link} to="/cart">
+              <Badge badgeContent={4} color="secondary">
+                <ShoppingCartIcon />
+              </Badge>
+            </Button>
+            <Button color="inherit" onClick={handleMenu}>
+              {user?.name || 'User'}
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem component={Link} to="/profile">Profile</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <Button color="inherit" component={Link} to="/login">
+            Login
+          </Button>
+        )}
       </Toolbar>
     </CustomNavbar>
   );
 };
 
-export default NavbarComponent;
+export default Navbar;

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, FaSpinner } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 
 // Background video or image
 import pizzaVideo from './pizza.mp4';
@@ -231,23 +233,38 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', error: false });
   const [passwordStrength, setPasswordStrength] = useState(0);
+  
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', error: false });
 
-    // Simulate login API call
-    setTimeout(() => {
-      // Bypass validation and redirect to pizza page
-      setMessage({ text: 'Login successful! Redirecting...', error: false });
-      setLoading(false);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Redirect to the pizza page after a short delay
-      setTimeout(() => {
-        window.location.href = '/pizzas'; // Replace with your pizza page URL
-      }, 1000); // 1 second delay before redirecting
-    }, 2000); // Simulate a 2-second API call
+      // For demo purposes, accept any email/password
+      // In a real app, you would validate credentials against your backend
+      const userData = {
+        email,
+        name: email.split('@')[0], // Just for demo
+      };
+
+      login(userData);
+      setMessage({ text: 'Login successful! Redirecting...', error: false });
+
+      // Redirect to the page user tried to visit or home
+      const from = location.state?.from?.pathname || '/home';
+      navigate(from, { replace: true });
+    } catch (error) {
+      setMessage({ text: 'Login failed. Please try again.', error: true });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculatePasswordStrength = (password) => {
