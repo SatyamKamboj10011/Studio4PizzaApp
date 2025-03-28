@@ -50,18 +50,18 @@ jobs:
     needs: deploy  # Waits for deploy job to finish
 
     steps:
-      - name: 🔎 Install ZAP CLI
+      - name: ⬇️ Download OWASP ZAP
         run: |
-          sudo apt-get update
-          sudo apt-get install -y zaproxy
-          echo "✅ ZAP CLI Installed Successfully."
+          curl -L -o zap.tar.gz https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Linux.tar.gz
+          tar -xvzf zap.tar.gz -C /opt
+          echo "✅ OWASP ZAP downloaded and extracted successfully."
 
       - name: 🔎 Run OWASP ZAP Security Scan
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
         run: |
           echo "🛡️ Starting OWASP ZAP Security Scan..."
-          zap-cli quick-scan --self-contained --start-options "-config api.disablekey=true" http://${{ secrets.SERVER_HOST }}
+          /opt/ZAP_2.11.1/zap.sh -cmd -quickurl http://${{ secrets.SERVER_HOST }} -quickprogress
           echo "✅ OWASP ZAP Security Scan Completed."
 
   quality-check:
@@ -86,4 +86,3 @@ jobs:
         run: |
           npm test -- --watchAll=false
           echo "✅ Jest tests completed successfully."
-
