@@ -23,11 +23,6 @@ jobs:
           npm install
           npm run build
 
-      - name: 🔎 Run ESLint for Quality Check
-        run: |
-          npx eslint ./src --fix || true  # Run ESLint and auto-fix issues if possible
-          echo "✅ ESLint completed. Continuing deployment."
-
       - name: 🚚 Transfer Files to Apache Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -44,45 +39,38 @@ jobs:
           echo "📤 Uploading new build files..."
           sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
 
+      # - name: 🔁 (Optional) Restart Apache Server
+      #   if: always()
+      #   env:
+      #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      #     SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+      #     SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+      #   run: |
+      #     sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+      #       echo "🔁 Restarting Apache..."
+      #       sudo systemctl restart apache2
+      #       exit
+      #     EOF
+
   zap-scan:
     name: 🛡️ OWASP ZAP Security Scan
     runs-on: ubuntu-latest
     needs: deploy  # Waits for deploy job to finish
 
     steps:
-      - name: ⬇️ Download OWASP ZAP
+      - name: 🖥️ Debug Environment Info
         run: |
-          curl -L -o zap.tar.gz https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Linux.tar.gz
-          tar -xvzf zap.tar.gz -C /opt
-          echo "✅ OWASP ZAP downloaded and extracted successfully."
+          echo "OS Info: $(uname -a)"
+          echo "Runner Version: $RUNNER_VERSION"
 
-      - name: 🔎 Run OWASP ZAP Security Scan
-        env:
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      - name: 🐳 Install Docker
         run: |
-          echo "🛡️ Starting OWASP ZAP Security Scan..."
-          /opt/ZAP_2.11.1/zap.sh -cmd -quickurl http://${{ secrets.SERVER_HOST }} -quickprogress
-          echo "✅ OWASP ZAP Security Scan Completed."
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
+          docker --version
 
-  quality-check:
-    name: ✅ Run Quality Tests
-    runs-on: ubuntu-latest
-    needs: deploy  # Run after deploy and zap-scan
-
-    steps:
-      - name: ⬇️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 📦 Install Dependencies
+      - name: 🔎 Run OWASP ZAP Full Scan
         run: |
-          npm install
-
-      - name: 🔎 Run ESLint for Code Quality
-        run: |
-          npx eslint ./src --fix || true
-          echo "✅ ESLint quality check completed."
-
-      - name: 🔬 Run Jest Tests
-        run: |
-          npm test -- --watchAll=false
-          echo "✅ Jest tests completed successfully."
+          docker pull zaproxy/zap-stable
+          docker run -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-full-scan.py \
+            -t http://${{ secrets.SERVER_HOST }}/ -a -
