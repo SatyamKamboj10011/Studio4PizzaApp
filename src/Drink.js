@@ -69,7 +69,7 @@ const Drinks = () => {
       name: "Cyber Citrus Splash",
       price: 4.49,
       category: "cold",
-      image: "splash.jpeg",
+      image: "splash.jpg",
       description: "AI-enhanced orange juice with quantum pulp"
     },
     {
