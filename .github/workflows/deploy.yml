@@ -1,1 +1,97 @@
+name: Deploy React App to Apache Server
+
+on:
+  push:
+    branches:
+      - main  # Change this to your target branch if needed
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to Apache Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Install SSH & SSHPass
+        run: sudo apt-get install -y sshpass
+
+      - name: 📦 Install Dependencies & Run Tests
+        run: |
+          export CI=false  # Prevent ESLint warnings from failing the build
+          npm install
+          npm run test -- --watchAll=false  # ✅ Run Jest unit tests before build
+
+      - name: 🏗️ Build React App
+        run: |
+          npm run build
+
+      - name: 🚚 Transfer Files to Apache Server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          echo "Connecting to $SERVER_HOST..."
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+            echo "✅ Connected to server. Cleaning old files..."
+            sudo rm -rf /var/www/html/*
+            exit
+          EOF
+
+          echo "📤 Uploading new build files..."
+          sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
+
+  zap-scan:
+    name: 🛡️ OWASP ZAP Security Scan
+    runs-on: ubuntu-latest
+    needs: deploy  # Waits for deploy job to finish
+
+    steps:
+      - name: 🖥️ Debug Environment Info
+        run: |
+          echo "OS Info: $(uname -a)"
+          echo "Runner Version: $RUNNER_VERSION"
+
+      - name: 🐳 Install Docker
+        run: |
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
+          docker --version
+
+      - name: 🔎 Run OWASP ZAP Full Scan
+        run: |
+          docker pull zaproxy/zap-stable
+          docker run -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-full-scan.py \
+            -t http://${{ secrets.SERVER_HOST }}/ -a -I
+
+  quality-test:
+    name: 🎯 Quality Tests
+    runs-on: ubuntu-latest
+    needs: deploy  # Waits for deployment before testing
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📚 Install Dependencies
+        run: |
+          npm install
+          npm run build
+
+      - name: ⚡ Run Jest Unit Tests
+        run: |
+          npm run test -- --watchAll=false  # ✅ Run Jest to ensure no errors
+
+      - name: 📊 Run Lighthouse CI for Performance & SEO
+        run: |
+          npm install -g @lhci/cli@0.9.x
+          lhci autorun --collect.url=http://${{ secrets.SERVER_HOST }}/ --upload.target=temporary-public-storage
+
+      - name: 📤 Upload Lighthouse Results as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: ./lhci_reports/
 
