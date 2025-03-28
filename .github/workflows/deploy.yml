@@ -17,7 +17,7 @@ jobs:
       - name: 🔧 Install SSH & SSHPass
         run: sudo apt-get install -y sshpass
 
-      - name: 📦 Install Dependencies & Run Tests
+      - name: 📚 Install Dependencies & Run Tests
         run: |
           export CI=false  # Prevent ESLint warnings from failing the build
           npm install
@@ -94,4 +94,3 @@ jobs:
         with:
           name: lighthouse-report
           path: ./lhci_reports/
-
