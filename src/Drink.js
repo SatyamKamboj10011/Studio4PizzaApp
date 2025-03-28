@@ -30,14 +30,116 @@ const Drinks = () => {
   const [category, setCategory] = useState("all");
   const [sortOption, setSortOption] = useState("alphabetically");
 
+  // Sample drinks data
+  const sampleDrinks = [
+    {
+      id: 1,
+      name: "Neon Nitro Cola",
+      price: 4.99,
+      category: "cold",
+      image: "cola.jpeg",
+      description: "Glowing carbonated beverage with electric lime flavor"
+    },
+    {
+      id: 2,
+      name: "Quantum Quencher",
+      price: 5.49,
+      category: "cold",
+      image: "quantum.jpeg",
+      description: "Zero-gravity infused ice tea with holographic bubbles"
+    },
+    {
+      id: 3,
+      name: "Solar Flare Latte",
+      price: 6.99,
+      category: "hot",
+      image: "latte.jpeg",
+      description: "Sun-powered coffee with caramelized stardust topping"
+    },
+    {
+      id: 4,
+      name: "Galactic Gulp",
+      price: 7.99,
+      category: "alcoholic",
+      image: "gulp.jpeg",
+      description: "Vortex vodka with nebula nectar and asteroid ice"
+    },
+    {
+      id: 5,
+      name: "Cyber Citrus Splash",
+      price: 4.49,
+      category: "cold",
+      image: "splash.jpg",
+      description: "AI-enhanced orange juice with quantum pulp"
+    },
+    {
+      id: 6,
+      name: "Hologram Hot Chocolate",
+      price: 6.49,
+      category: "hot",
+      image: "hotchocolate.jpeg",
+      description: "Projection-mapped cocoa with floating marshmallow clouds"
+    },
+    {
+      id: 7,
+      name: "Plasma Punch",
+      price: 8.99,
+      category: "alcoholic",
+      image: "punch.jpeg",
+      description: "Ionized rum with anti-gravity pineapple foam"
+    },
+    {
+      id: 8,
+      name: "Neural Network Nitro",
+      price: 5.99,
+      category: "cold",
+      image: "nitro.jpeg",
+      description: "Deep learning-optimized cold brew coffee"
+    },
+    {
+      id: 9,
+      name: "Singularity Soda",
+      price: 4.99,
+      category: "cold",
+      image: "soda.jpeg",
+      description: "Black hole-infused cola with infinite fizz"
+    },
+    {
+      id: 10,
+      name: "Warp Core Whiskey",
+      price: 9.99,
+      category: "alcoholic",
+      image: "whiskey.jpeg",
+      description: "Subspace-aged bourbon with dilithium crystals"
+    },
+    {
+      id: 11,
+      name: "Android Affogato",
+      price: 7.49,
+      category: "hot",
+      image: "affogato.webp",
+      description: "Robotic espresso poured over quantum ice cream"
+    },
+    {
+      id: 12,
+      name: "Photon Frappé",
+      price: 6.99,
+      category: "cold",
+      image: "frappe.jpeg",
+      description: "Light-speed blended mocha with laser whipped cream"
+    }
+  ];
+
   useEffect(() => {
     axios
       .get("http://localhost:5000/drinks")
       .then((response) => {
-        setDrinks(response.data);
+        // Use API data if available, otherwise use sample drinks
+        setDrinks(response.data.length > 0 ? response.data : sampleDrinks);
       })
       .catch((error) => {
         console.error("Error fetching drinks:", error);
+        setDrinks(sampleDrinks); // Fallback to sample data
       });
   }, []);
 
