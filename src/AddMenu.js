@@ -14,8 +14,228 @@ import {
   Snackbar,
   IconButton,
   CircularProgress,
+  Paper,
+  Divider,
 } from "@mui/material";
-import { Close, CloudUpload } from "@mui/icons-material";
+import { Close, CloudUpload, LocalPizza, Restaurant, Cake, Euro } from "@mui/icons-material";
+import { styled as muiStyled } from '@mui/material/styles';
+import styled, { keyframes, css } from "styled-components";
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const fadeInAnimation = css`
+  animation: ${fadeIn} 0.6s ease-out;
+`;
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 40px 0;
+`;
+
+const FormBox = muiStyled(Paper)(({ theme }) => ({
+  padding: '3.5rem',
+  borderRadius: '30px',
+  backgroundColor: '#ffffff',
+  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
+  transition: 'all 0.3s ease-in-out',
+  opacity: 0,
+  transform: 'translateY(20px)',
+  animation: 'fadeIn 0.6s ease-out forwards',
+  '@keyframes fadeIn': {
+    from: {
+      opacity: 0,
+      transform: 'translateY(20px)',
+    },
+    to: {
+      opacity: 1,
+      transform: 'translateY(0)',
+    },
+  },
+  '&:hover': {
+    transform: 'translateY(-5px)',
+    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.12)',
+  },
+}));
+
+const StyledTextField = muiStyled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: 'rgba(0, 0, 0, 0.15)',
+      borderRadius: '12px',
+      transition: 'all 0.2s ease',
+    },
+    '&:hover fieldset': {
+      borderColor: '#ff4b2b',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#ff4b2b',
+      borderWidth: '2px',
+    },
+    '& input': {
+      padding: '15px',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: '#666',
+    '&.Mui-focused': {
+      color: '#ff4b2b',
+    },
+  },
+});
+
+const StyledFormControl = muiStyled(FormControl)({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    '& fieldset': {
+      borderColor: 'rgba(0, 0, 0, 0.15)',
+      transition: 'all 0.2s ease',
+    },
+    '&:hover fieldset': {
+      borderColor: '#ff4b2b',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#ff4b2b',
+      borderWidth: '2px',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: '#666',
+    '&.Mui-focused': {
+      color: '#ff4b2b',
+    },
+  },
+  '& .MuiSelect-select': {
+    padding: '15px',
+  },
+});
+
+const UploadButton = styled(Button)`
+  border-radius: 12px;
+  padding: 15px 25px;
+  border: 2px dashed #ff4b2b;
+  color: #ff4b2b;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 75, 43, 0.03);
+  text-transform: none;
+  
+  &:hover {
+    background: rgba(255, 75, 43, 0.08);
+    border-color: #ff416c;
+    transform: translateY(-2px);
+  }
+
+  .MuiSvgIcon-root {
+    margin-right: 10px;
+    font-size: 1.5rem;
+  }
+`;
+
+const SubmitButton = styled(Button)`
+  background: linear-gradient(45deg, #ff4b2b, #ff416c);
+  border-radius: 12px;
+  padding: 15px 35px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 75, 43, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(255, 75, 43, 0.4);
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+  }
+
+  &:disabled {
+    background: #ccc;
+  }
+`;
+
+const ImagePreview = styled.div`
+  margin-top: 1.5rem;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 100%);
+    pointer-events: none;
+  }
+`;
+
+const SectionTitle = styled(Typography)`
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(45deg, #ff4b2b, #ff416c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+`;
+
+const PriceSection = styled(Box)`
+  position: relative;
+  padding: 20px;
+  background: rgba(255, 75, 43, 0.03);
+  border-radius: 15px;
+  margin: 10px 0;
+
+  .price-icon {
+    position: absolute;
+    top: -15px;
+    left: 20px;
+    background: white;
+    padding: 5px;
+    border-radius: 50%;
+    color: #ff4b2b;
+  }
+`;
+
+const TypeIcon = ({ type }) => {
+  switch (type) {
+    case 'pizza':
+      return <LocalPizza sx={{ color: '#ff4b2b', fontSize: 30 }} />;
+    case 'side':
+      return <Restaurant sx={{ color: '#ff4b2b', fontSize: 30 }} />;
+    case 'desserts':
+      return <Cake sx={{ color: '#ff4b2b', fontSize: 30 }} />;
+    default:
+      return null;
+  }
+};
 
 const AddMenuPage = () => {
   // State for form data
@@ -115,211 +335,186 @@ const AddMenuPage = () => {
   };
 
   return (
-    <Container style={{ padding: "20px" }}>
-      <Box
-        style={{
-          marginTop: "5rem",
-          marginBottom: "5rem",
-          padding: "2rem",
-          borderRadius: "15px",
-          backgroundColor: "rgba(255, 255, 255, 0.1)",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
-          border: "1px solid rgba(255, 255, 255, 0.2)",
-        }}
-      >
-        <Typography
-          variant="h4"
-          align="center"
-          gutterBottom
-          style={{ fontWeight: "bold", color: "#ff4b2b" }}
-        >
-          Add Menu Item
-        </Typography>
+    <PageWrapper>
+      <Container maxWidth="md">
+        <FormBox elevation={0}>
+          <Box textAlign="center" mb={5}>
+            <TypeIcon type={type} />
+            <SectionTitle variant="h4" gutterBottom>
+              Add New {type.charAt(0).toUpperCase() + type.slice(1)}
+            </SectionTitle>
+            <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1 }}>
+              Fill in the details below to add a new menu item
+            </Typography>
+          </Box>
 
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={4}>
-            {/* Name Field */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Name"
-                fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                variant="outlined"
-                size="small"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-              />
-            </Grid>
-
-            {/* Type Field */}
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth variant="outlined" size="small">
-                <InputLabel>Type</InputLabel>
-                <Select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  label="Type"
-                  required
-                  style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                >
-                  <MenuItem value="pizza">Pizza</MenuItem>
-                  <MenuItem value="side">Side</MenuItem>
-                  <MenuItem value="desserts">Dessert</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {/* Price Fields for Pizza or Side */}
-            {(type === "pizza" || type === "side") && (
-              <>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Small Price"
-                    type="number"
-                    fullWidth
-                    value={smallPrice}
-                    onChange={(e) => setSmallPrice(e.target.value)}
-                    required
-                    variant="outlined"
-                    size="small"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Large Price"
-                    type="number"
-                    fullWidth
-                    value={largePrice}
-                    onChange={(e) => setLargePrice(e.target.value)}
-                    required
-                    variant="outlined"
-                    size="small"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                  />
-                </Grid>
-                {type === "pizza" && (
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Extra Large Price"
-                      type="number"
-                      fullWidth
-                      value={extraLargePrice}
-                      onChange={(e) => setExtraLargePrice(e.target.value)}
-                      required
-                      variant="outlined"
-                      size="small"
-                      style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                    />
-                  </Grid>
-                )}
-              </>
-            )}
-
-            {/* Price Field for Dessert */}
-            {type === "desserts" && (
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={4}>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Price"
-                  type="number"
+                <StyledTextField
+                  label="Name"
                   fullWidth
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
-                  variant="outlined"
-                  size="small"
-                  style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                  size="medium"
+                  placeholder="Enter item name"
                 />
               </Grid>
-            )}
 
-            {/* Image Field */}
-            <Grid item xs={12} sm={6}>
-              <Button
-                variant="outlined"
-                component="label"
-                fullWidth
-                startIcon={<CloudUpload />}
-                style={{
-                  padding: "10px",
-                  borderStyle: "dashed",
-                  borderColor: "#ff4b2b",
-                  color: "#ff4b2b",
-                }}
-              >
-                Upload Image
-                <input type="file" hidden onChange={handleImageChange} required />
-              </Button>
-              {image && (
-                <img
-                  src={URL.createObjectURL(image)}
-                  alt="Preview"
-                  style={{
-                    width: "100%",
-                    height: "200px",
-                    objectFit: "cover",
-                    borderRadius: "10px",
-                    marginTop: "1rem",
-                  }}
-                />
+              <Grid item xs={12} sm={6}>
+                <StyledFormControl fullWidth>
+                  <InputLabel>Type</InputLabel>
+                  <Select
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    label="Type"
+                    required
+                  >
+                    <MenuItem value="pizza">Pizza</MenuItem>
+                    <MenuItem value="side">Side</MenuItem>
+                    <MenuItem value="desserts">Dessert</MenuItem>
+                  </Select>
+                </StyledFormControl>
+              </Grid>
+
+              {(type === "pizza" || type === "side") && (
+                <Grid item xs={12}>
+                  <PriceSection>
+                    <Euro className="price-icon" />
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <StyledTextField
+                          label="Small Price"
+                          type="number"
+                          fullWidth
+                          value={smallPrice}
+                          onChange={(e) => setSmallPrice(e.target.value)}
+                          required
+                          size="medium"
+                          placeholder="0.00"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <StyledTextField
+                          label="Large Price"
+                          type="number"
+                          fullWidth
+                          value={largePrice}
+                          onChange={(e) => setLargePrice(e.target.value)}
+                          required
+                          size="medium"
+                          placeholder="0.00"
+                        />
+                      </Grid>
+                      {type === "pizza" && (
+                        <Grid item xs={12}>
+                          <StyledTextField
+                            label="Extra Large Price"
+                            type="number"
+                            fullWidth
+                            value={extraLargePrice}
+                            onChange={(e) => setExtraLargePrice(e.target.value)}
+                            required
+                            size="medium"
+                            placeholder="0.00"
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
+                  </PriceSection>
+                </Grid>
               )}
-            </Grid>
 
-            {/* Description Field */}
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                fullWidth
-                multiline
-                rows={4}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-                variant="outlined"
-                size="small"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-              />
-            </Grid>
+              {type === "desserts" && (
+                <Grid item xs={12}>
+                  <PriceSection>
+                    <Euro className="price-icon" />
+                    <StyledTextField
+                      label="Price"
+                      type="number"
+                      fullWidth
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      required
+                      size="medium"
+                      placeholder="0.00"
+                    />
+                  </PriceSection>
+                </Grid>
+              )}
 
-            {/* Submit Button */}
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                fullWidth
-                size="large"
-                disabled={loading}
-                style={{
-                  borderRadius: "8px",
-                  padding: "12px 24px",
-                  marginTop: "2rem",
-                  fontWeight: "bold",
-                  backgroundColor: "#ff4b2b",
-                  color: "#fff",
-                }}
-              >
-                {loading ? <CircularProgress size={24} color="inherit" /> : "Add Item"}
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Box>
+              <Grid item xs={12}>
+                <Divider sx={{ my: 2 }} />
+              </Grid>
 
-      {/* Snackbar for Success/Error Messages */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message={message}
-        action={
-          <IconButton size="small" color="inherit" onClick={handleCloseSnackbar}>
-            <Close fontSize="small" />
-          </IconButton>
-        }
-      />
-    </Container>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  Upload Item Image
+                </Typography>
+                <UploadButton
+                  variant="outlined"
+                  component="label"
+                  fullWidth
+                  startIcon={<CloudUpload />}
+                >
+                  Choose Image
+                  <input type="file" hidden onChange={handleImageChange} required />
+                </UploadButton>
+                {image && (
+                  <ImagePreview>
+                    <img src={URL.createObjectURL(image)} alt="Preview" />
+                  </ImagePreview>
+                )}
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  Item Description
+                </Typography>
+                <StyledTextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                  size="medium"
+                  placeholder="Enter a detailed description of the item..."
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Divider sx={{ my: 2 }} />
+              </Grid>
+
+              <Grid item xs={12}>
+                <SubmitButton
+                  variant="contained"
+                  type="submit"
+                  fullWidth
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} color="inherit" /> : "Add to Menu"}
+                </SubmitButton>
+              </Grid>
+            </Grid>
+          </form>
+        </FormBox>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          message={message}
+          action={
+            <IconButton size="small" color="inherit" onClick={handleCloseSnackbar}>
+              <Close fontSize="small" />
+            </IconButton>
+          }
+        />
+      </Container>
+    </PageWrapper>
   );
 };
 

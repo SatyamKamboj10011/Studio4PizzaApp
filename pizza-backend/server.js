@@ -5,6 +5,8 @@ require("dotenv").config();
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 app.use(cors());
@@ -49,14 +51,14 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root", // Default XAMPP MySQL user
   password: "", // Default is empty
-  database: "pizza_ordering_db",
+  database: "pizza_ordering_db", // Make sure this matches your database name
 });
 
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed: " + err.message);
   } else {
-    console.log("Connected to MySQL Database!");
+    console.log("Connected to MySQL Database: pizza_ordering_db");
   }
 });
 
@@ -288,7 +290,120 @@ app.post("/checkout", (req, res) => {
   });
 });
 
+// Login endpoint
+app.post("/login", async (req, res) => {
+  console.log("Received login request:", req.body);
+  const { email, password } = req.body;
 
+  try {
+    // Check if user exists
+    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, users) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: "Server error" });
+      }
+
+      if (users.length === 0) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      const user = users[0];
+
+      // Verify password
+      const validPassword = await bcrypt.compare(password, user.password);
+
+      if (!validPassword) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Generate JWT token
+      const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        "your_jwt_secret_key",
+        { expiresIn: "24h" }
+      );
+
+      // Remove password from user object before sending
+      const { password: _, ...userWithoutPassword } = user;
+
+      res.json({
+        message: "Login successful",
+        user: userWithoutPassword,
+        token,
+      });
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// Registration endpoint
+app.post("/register", async (req, res) => {
+  console.log("Received registration request:", req.body);
+  const { name, email, password } = req.body;
+
+  // Validate input
+  if (!name || !email || !password) {
+    console.log("Missing required fields:", { name, email, password: !!password });
+    return res.status(400).json({ message: "Please provide all required fields" });
+  }
+
+  try {
+    // First, verify we're connected to the right database
+    db.query("SELECT DATABASE()", (err, result) => {
+      if (err) {
+        console.error("Database verification error:", err);
+        return res.status(500).json({ message: "Database connection error" });
+      }
+      console.log("Current database:", result[0]['DATABASE()']);
+    });
+
+    // Check if user already exists
+    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, users) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: "Server error" });
+      }
+
+      if (users.length > 0) {
+        console.log("Email already registered:", email);
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      // Insert new user
+      const query = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'customer')";
+      db.query(query, [name, email, hashedPassword], (err, result) => {
+        if (err) {
+          console.error("Error inserting user:", err);
+          return res.status(500).json({ message: "Error creating user" });
+        }
+
+        console.log("User created successfully:", result.insertId);
+
+        // Generate JWT token
+        const token = jwt.sign(
+          { userId: result.insertId, role: 'customer' },
+          "your_jwt_secret_key",
+          { expiresIn: "24h" }
+        );
+
+        res.status(201).json({
+          message: "Registration successful",
+          user: { id: result.insertId, name, email, role: 'customer' },
+          token
+        });
+      });
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
 
 // Start Server on Port 5000
 app.listen(5000, () => {

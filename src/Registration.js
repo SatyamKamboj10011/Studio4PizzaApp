@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 // Keyframes for animations
 const fadeIn = keyframes`
@@ -163,7 +166,73 @@ const Footer = styled.div`
   }
 `;
 
+const StyledForm = styled.form`
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2.5rem;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: ${fadeIn} 1s ease-in-out;
+`;
+
+const StyledInput = styled.input`
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #ff6b6b;
+  }
+`;
+
+const StyledButton = styled.button`
+  width: 100%;
+  padding: 0.75rem;
+  margin: 1.5rem 0;
+  background: linear-gradient(135deg, #ff6b6b, #ff5252);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    animation: ${pulse} 1s infinite;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
+const StyledMessage = styled.div`
+  color: ${props => props.$error ? '#ff4444' : '#00C851'};
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+`;
+
 const Register = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -172,20 +241,51 @@ const Register = () => {
   const [message, setMessage] = useState({ text: '', error: false });
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', error: false });
 
-    // Simulate registration API call
-    setTimeout(() => {
-      if (email && password && name) {
-        setMessage({ text: 'Registration successful!', error: false });
-      } else {
-        setMessage({ text: 'Please fill all fields correctly.', error: true });
+    try {
+      console.log('Attempting registration with:', { name, email, password });
+      
+      const response = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(errorText || "Registration failed");
       }
+
+      const data = await response.json();
+      console.log('Registration successful:', data);
+
+      // Use the login function from AuthContext to automatically log in the user
+      login(data.user, data.token);
+
+      setMessage({ text: 'Registration successful!', error: false });
+      toast.success("Registration successful!");
+
+      // Redirect to home page
+      navigate("/");
+    } catch (error) {
+      console.error("Registration error:", error);
+      setMessage({ text: error.message || "Registration failed", error: true });
+      toast.error(error.message || "Registration failed");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   const calculatePasswordStrength = (password) => {
@@ -199,7 +299,7 @@ const Register = () => {
 
   return (
     <RegisterContainer>
-      <RegisterForm onSubmit={handleSubmit}>
+      <StyledForm onSubmit={handleSubmit}>
         <Title>Create Account</Title>
 
         <InputContainer>
@@ -250,7 +350,11 @@ const Register = () => {
           </PasswordStrength>
         </InputContainer>
 
-        {message.text && <Message error={message.error}>{message.text}</Message>}
+        {message.text && (
+          <StyledMessage $error={message.error}>
+            {message.text}
+          </StyledMessage>
+        )}
 
         <Button type="submit" disabled={loading}>
           {loading ? <><Spinner /> Registering...</> : 'Register'}
@@ -259,7 +363,7 @@ const Register = () => {
         <Footer>
           Already have an account? <a href="/Login">Login</a>
         </Footer>
-      </RegisterForm>
+      </StyledForm>
     </RegisterContainer>
   );
 };
