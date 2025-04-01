@@ -58,8 +58,9 @@ const NavbarComponent = () => {
             <StyledNavLink to="/pizzas">Pizza</StyledNavLink>
             <StyledNavLink to="/side">Side</StyledNavLink>
             <StyledNavLink to="/dessert">Dessert</StyledNavLink>
-            <StyledNavLink to="/drink">Drink</StyledNavLink>
+            <StyledNavLink to="/drinks">Drink</StyledNavLink>
             <StyledNavLink to="/cart">Cart</StyledNavLink>
+            <StyledNavLink to="/addmenu">AddMenuPage</StyledNavLink>
             {user?.role === "admin" && (
               <StyledNavLink to="/admin">Admin Dashboard</StyledNavLink>
             )}

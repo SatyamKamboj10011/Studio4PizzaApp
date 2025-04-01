@@ -270,7 +270,7 @@ const AddMenuPage = () => {
       formData.append("small_price", parseFloat(smallPrice));
       formData.append("large_price", parseFloat(largePrice));
     } else {
-      formData.append("price", parseFloat(price)); // For sides and desserts
+      formData.append("price", parseFloat(price)); // For sides and desserts and drinks
     }
 
     // Determine the API URL based on the type
@@ -281,6 +281,9 @@ const AddMenuPage = () => {
       url = "http://localhost:5000/add/side";
     } else if (type === "desserts") {
       url = "http://localhost:5000/add/desserts";
+    }
+    else if(type === "drinks"){
+      url = "http://localhost:5000/add/drinks"
     }
 
     try {
@@ -374,6 +377,7 @@ const AddMenuPage = () => {
                     <MenuItem value="pizza">Pizza</MenuItem>
                     <MenuItem value="side">Side</MenuItem>
                     <MenuItem value="desserts">Dessert</MenuItem>
+                    <MenuItem value="drinks">Drinks</MenuItem>
                   </Select>
                 </StyledFormControl>
               </Grid>
@@ -427,6 +431,23 @@ const AddMenuPage = () => {
               )}
 
               {type === "desserts" && (
+                <Grid item xs={12}>
+                  <PriceSection>
+                    <Euro className="price-icon" />
+                    <StyledTextField
+                      label="Price"
+                      type="number"
+                      fullWidth
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      required
+                      size="medium"
+                      placeholder="0.00"
+                    />
+                  </PriceSection>
+                </Grid>
+              )}
+               {type === "drinks" && (
                 <Grid item xs={12}>
                   <PriceSection>
                     <Euro className="price-icon" />
