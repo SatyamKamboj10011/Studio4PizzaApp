@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Table, Button, Card } from "react-bootstrap";
+import { Container, Table, Button } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 // Styled Components
 const CartContainer = styled(Container)`
@@ -50,9 +51,11 @@ const RemoveButton = styled(Button)`
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    console.log("Loaded cart from localStorage:", savedCart); // Debugging
     setCart(savedCart);
   }, []);
 
@@ -63,21 +66,13 @@ const Cart = () => {
     toast.info("❌ Item removed from cart!");
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (cart.length === 0) {
       toast.error("Your cart is empty!");
       return;
     }
-
-    try {
-      await axios.post("http://localhost:5000/checkout", { cart });
-      toast.success("✅ Order placed successfully!");
-      localStorage.removeItem("cart");
-      setCart([]);
-    } catch (error) {
-      console.error("Error during checkout:", error);
-      toast.error("⚠️ Failed to place order. Try again!");
-    }
+    // Navigate to the Checkout page and pass the cart data as state
+    navigate("/checkout", { state: { cart } });
   };
 
   return (
@@ -86,47 +81,45 @@ const Cart = () => {
       {cart.length === 0 ? (
         <h5 className="text-center">Your cart is empty.</h5>
       ) : (
-        <Table responsive bordered hover className="text-center">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Image</th>
-              <th>Item</th>
-              <th>Size</th>
-              <th>Toppings</th>
-              <th>Price ($)</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cart.map((item, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>
-                  <CartImage
-                    src={`http://localhost:5000/images/${item.image}`}
-                    alt={item.name}
-                  />
-                </td>
-                <td>{item.name || "Unknown Item"}</td>
-                <td>{item.size || "None"}</td>
-                <td>{item.toppings?.length > 0 ? item.toppings.join(", ") : "None"}</td>
-                <td>{item.total_price ? parseFloat(item.total_price).toFixed(2) : "0.00"}</td>
-                <td>
-                  <RemoveButton onClick={() => handleRemove(index)}>❌ Remove</RemoveButton>
-                </td>
+        <>
+          <Table responsive bordered hover className="text-center">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Image</th>
+                <th>Item</th>
+                <th>Size</th>
+                <th>Toppings</th>
+                <th>Price ($)</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {cart.map((item, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <CartImage
+                      src={`http://localhost:5000/images/${item.image}`}
+                      alt={item.name}
+                    />
+                  </td>
+                  <td>{item.name || "Unknown Item"}</td>
+                  <td>{item.size || "None"}</td>
+                  <td>{item.toppings?.length > 0 ? item.toppings.join(", ") : "None"}</td>
+                  <td>{item.total_price ? parseFloat(item.total_price).toFixed(2) : "0.00"}</td>
+                  <td>
+                    <RemoveButton onClick={() => handleRemove(index)}>❌ Remove</RemoveButton>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <div className="text-center mt-4">
+            <CheckoutButton onClick={handleCheckout}>✅ Checkout & Place Order</CheckoutButton>
+          </div>
+        </>
       )}
-
-      {cart.length > 0 && (
-        <div className="text-center mt-4">
-          <CheckoutButton onClick={handleCheckout}>✅ Checkout & Place Order</CheckoutButton>
-        </div>
-      )}
-
       <ToastContainer position="top-center" autoClose={3000} />
     </CartContainer>
   );

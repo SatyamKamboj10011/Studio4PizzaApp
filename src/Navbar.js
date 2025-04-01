@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { styled } from "@mui/system";
 import { AppBar, Toolbar, IconButton, Typography, Button, Badge, InputBase, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -45,9 +45,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState(3); // Example cart items count
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -69,6 +67,7 @@ const Navbar = () => {
     { path: "/drink", name: "Drink" },
     { path: "/addmenu", name: "Add Menu" },
     { path: "/checkout", name: "Checkout" },
+    { path: "/", name: "Login" }, // Added Login link
   ];
 
   return (
@@ -103,7 +102,7 @@ const Navbar = () => {
         <Typography
           variant="h6"
           component={Link}
-          to="/"
+          to="/home"
           sx={{
             flexGrow: 1,
             textDecoration: "none",
@@ -130,7 +129,7 @@ const Navbar = () => {
         </Search>
 
         {/* Navigation Links */}
-        <div sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           {navLinks.map((item, index) => (
             <Button
               key={index}

@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, FaSpinner } from 'react-icons/fa';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
 
 // Background video or image
 import pizzaVideo from './pizza.mp4';
@@ -25,7 +23,7 @@ const spin = keyframes`
   to { transform: rotate(360deg); }
 `;
 
-// Styled components
+// Styled Components (must be defined before they're used)
 const LoginContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -225,6 +223,7 @@ const Footer = styled.div`
   }
 `;
 
+// Main Login Component
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -233,38 +232,23 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', error: false });
   const [passwordStrength, setPasswordStrength] = useState(0);
-  
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { login } = useAuth();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', error: false });
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // For demo purposes, accept any email/password
-      // In a real app, you would validate credentials against your backend
-      const userData = {
-        email,
-        name: email.split('@')[0], // Just for demo
-      };
-
-      login(userData);
+    // Simulate login API call
+    setTimeout(() => {
+      // Bypass validation and redirect to pizza page
       setMessage({ text: 'Login successful! Redirecting...', error: false });
-
-      // Redirect to the page user tried to visit or home
-      const from = location.state?.from?.pathname || '/home';
-      navigate(from, { replace: true });
-    } catch (error) {
-      setMessage({ text: 'Login failed. Please try again.', error: true });
-    } finally {
       setLoading(false);
-    }
+
+      // Redirect to the pizza page after a short delay
+      setTimeout(() => {
+        window.location.href = '/pizzas'; // Replace with your pizza page URL
+      }, 1000); // 1 second delay before redirecting
+    }, 2000); // Simulate a 2-second API call
   };
 
   const calculatePasswordStrength = (password) => {
@@ -280,7 +264,6 @@ const Login = () => {
     <LoginContainer>
       <BackgroundVideo autoPlay loop muted>
         <source src={pizzaVideo} type="video/mp4" />
-        Your browser does not support the video tag.
       </BackgroundVideo>
       <LoginForm
         onSubmit={handleSubmit}
@@ -289,11 +272,8 @@ const Login = () => {
         transition={{ duration: 0.5 }}
       >
         <Title>Slice & Dice</Title>
-
         <InputContainer>
-          <Icon>
-            <FaEnvelope />
-          </Icon>
+          <Icon><FaEnvelope /></Icon>
           <Input
             type="email"
             placeholder="Email"
@@ -302,11 +282,8 @@ const Login = () => {
             required
           />
         </InputContainer>
-
         <InputContainer>
-          <Icon>
-            <FaLock />
-          </Icon>
+          <Icon><FaLock /></Icon>
           <Input
             type={showPassword ? 'text' : 'password'}
             placeholder="Password"
@@ -324,7 +301,6 @@ const Login = () => {
             <StrengthBar strength={passwordStrength} />
           </PasswordStrength>
         </InputContainer>
-
         <Options>
           <label>
             <Checkbox
@@ -336,25 +312,15 @@ const Login = () => {
           </label>
           <Link href="#">Forgot Password?</Link>
         </Options>
-
         {message.text && <Message error={message.error}>{message.text}</Message>}
-
         <Button type="submit" disabled={loading}>
           {loading ? <><Spinner /> Logging in...</> : 'Login'}
         </Button>
-
         <SocialLogin>
-          <SocialButton>
-            <FaGoogle size={20} />
-          </SocialButton>
-          <SocialButton>
-            <FaFacebook size={20} />
-          </SocialButton>
-          <SocialButton>
-            <FaApple size={20} />
-          </SocialButton>
+          <SocialButton><FaGoogle size={20} /></SocialButton>
+          <SocialButton><FaFacebook size={20} /></SocialButton>
+          <SocialButton><FaApple size={20} /></SocialButton>
         </SocialLogin>
-
         <Footer>
           By logging in, you agree to our <Link href="#">Terms of Service</Link> and{' '}
           <Link href="#">Privacy Policy</Link>.

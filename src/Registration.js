@@ -257,7 +257,7 @@ const Register = () => {
         </Button>
 
         <Footer>
-          Already have an account? <a href="/login">Login</a>
+          Already have an account? <a href="/Login">Login</a>
         </Footer>
       </RegisterForm>
     </RegisterContainer>

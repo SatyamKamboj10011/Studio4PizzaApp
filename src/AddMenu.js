@@ -58,7 +58,7 @@ const AddMenuPage = () => {
     if (type === "pizza") {
       url = "http://localhost:5000/add/pizza";
     } else if (type === "side") {
-      url = "http://localhost:5000/side";
+      url = "http://localhost:5000/add/side";
     } else if (type === "desserts") {
       url = "http://localhost:5000/add/desserts";
     }

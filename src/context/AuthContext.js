@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext(null);
@@ -24,10 +25,24 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('authToken', 'dummy-token'); // In a real app, this would be a JWT
     localStorage.setItem('userData', JSON.stringify(userData));
+=======
+// src/context/AuthContext.js
+import { createContext, useState } from 'react';
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const login = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('isAuthenticated', 'true');
+>>>>>>> 99334f7fc14ed6a216939f899b6702853c2baf73
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+<<<<<<< HEAD
     setUser(null);
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
@@ -47,3 +62,14 @@ export const useAuth = () => {
   }
   return context;
 }; 
+=======
+    localStorage.removeItem('isAuthenticated');
+  };
+
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+>>>>>>> 99334f7fc14ed6a216939f899b6702853c2baf73
