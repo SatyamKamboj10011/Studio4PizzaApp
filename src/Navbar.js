@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import { AppBar, Toolbar, IconButton, Typography, Button, Badge, InputBase, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -45,7 +45,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [cartItems, setCartItems] = useState(3); // Example cart items count
+  const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -67,7 +69,6 @@ const Navbar = () => {
     { path: "/drink", name: "Drink" },
     { path: "/addmenu", name: "Add Menu" },
     { path: "/checkout", name: "Checkout" },
-    { path: "/", name: "Login" }, // Added Login link
   ];
 
   return (

@@ -1,7 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, FaSpinner } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Background video or image
 import pizzaVideo from './pizza.mp4';
@@ -232,23 +236,52 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', error: false });
   const [passwordStrength, setPasswordStrength] = useState(0);
+  
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', error: false });
 
-    // Simulate login API call
-    setTimeout(() => {
-      // Bypass validation and redirect to pizza page
-      setMessage({ text: 'Login successful! Redirecting...', error: false });
-      setLoading(false);
+    try {
+      if (!email || !password) {
+        throw new Error('Please fill in all fields');
+      }
 
-      // Redirect to the pizza page after a short delay
+      // Call the login function from AuthContext
+      await login(email, password);
+
+      // Show success message
+      toast.success('Login successful! Redirecting...', {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Redirect to the page user tried to visit or home
+      const from = location.state?.from?.pathname || '/home';
       setTimeout(() => {
-        window.location.href = '/pizzas'; // Replace with your pizza page URL
-      }, 1000); // 1 second delay before redirecting
-    }, 2000); // Simulate a 2-second API call
+        navigate(from, { replace: true });
+      }, 1000);
+    } catch (error) {
+      setMessage({ text: error.message || 'Login failed. Please try again.', error: true });
+      toast.error(error.message || 'Login failed. Please try again.', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculatePasswordStrength = (password) => {
