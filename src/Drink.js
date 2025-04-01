@@ -17,11 +17,11 @@ import {
 } from "@mui/material";
 import { AddShoppingCart } from "@mui/icons-material";
 import MuiAlert from "@mui/material/Alert";
-
+ 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-
+ 
 const Drinks = () => {
   const [drinks, setDrinks] = useState([]);
   const [cart, setCart] = useState([]);
@@ -29,7 +29,7 @@ const Drinks = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [category, setCategory] = useState("all");
   const [sortOption, setSortOption] = useState("alphabetically");
-
+ 
   // Sample drinks data
   const sampleDrinks = [
     {
@@ -129,7 +129,7 @@ const Drinks = () => {
       description: "Light-speed blended mocha with laser whipped cream"
     }
   ];
-
+ 
   useEffect(() => {
     axios
       .get("http://localhost:5000/drinks")
@@ -142,13 +142,13 @@ const Drinks = () => {
         setDrinks(sampleDrinks); // Fallback to sample data
       });
   }, []);
-
+ 
   const addToCart = (drink) => {
     setCart([...cart, drink]);
     setSnackbarMessage(`${drink.name} added to cart!`);
     setOpenSnackbar(true);
   };
-
+ 
   const sortedDrinks = [...drinks];
   if (sortOption === "alphabetically") {
     sortedDrinks.sort((a, b) => a.name.localeCompare(b.name));
@@ -157,12 +157,12 @@ const Drinks = () => {
   } else if (sortOption === "priceHighToLow") {
     sortedDrinks.sort((a, b) => b.price - a.price);
   }
-
+ 
   const filteredDrinks =
     category === "all"
       ? sortedDrinks
       : sortedDrinks.filter((drink) => drink.category === category);
-
+ 
   return (
     <Box sx={{ backgroundColor: "#0d0d0d", paddingTop: 10 }}>
       <Box
@@ -187,7 +187,7 @@ const Drinks = () => {
           </Typography>
         </Box>
       </Box>
-
+ 
       <Container sx={{ py: 6 }} maxWidth="lg">
         <Box sx={{ display: "flex", justifyContent: "center", mb: 4, gap: 2 }}>
           <FormControl sx={{ minWidth: 160, backgroundColor: "white", borderRadius: 1 }}>
@@ -199,7 +199,7 @@ const Drinks = () => {
               <MenuItem value="alcoholic">Alcoholic Drinks</MenuItem>
             </Select>
           </FormControl>
-
+ 
           <FormControl sx={{ minWidth: 160, backgroundColor: "white", borderRadius: 1 }}>
             <InputLabel></InputLabel>
             <Select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
@@ -209,14 +209,14 @@ const Drinks = () => {
             </Select>
           </FormControl>
         </Box>
-
+ 
         <Grid container spacing={4}>
           {filteredDrinks.map((drink) => (
             <Grid item xs={12} sm={6} md={4} key={drink.id}>
-              <Card sx={{ 
-                borderRadius: 6, 
-                transition: "transform 0.3s", 
-                "&:hover": { transform: "scale(1.05)" }, 
+              <Card sx={{
+                borderRadius: 6,
+                transition: "transform 0.3s",
+                "&:hover": { transform: "scale(1.05)" },
                 boxShadow: 3,
                 backgroundColor: "#222",
                 color: "white"
@@ -236,8 +236,8 @@ const Drinks = () => {
                   </Typography>
                   <Button
                     variant="contained"
-                    sx={{ 
-                      mt: 2, 
+                    sx={{
+                      mt: 2,
                       borderRadius: 4,
                       backgroundColor: "#ff4b2b",
                       "&:hover": { backgroundColor: "#e63946" }
@@ -253,7 +253,7 @@ const Drinks = () => {
           ))}
         </Grid>
       </Container>
-
+ 
       <Snackbar open={openSnackbar} autoHideDuration={4000} onClose={() => setOpenSnackbar(false)}>
         <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: "100%" }}>
           {snackbarMessage}
@@ -262,5 +262,5 @@ const Drinks = () => {
     </Box>
   );
 };
-
+ 
 export default Drinks;

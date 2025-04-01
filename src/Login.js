@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, FaSpinner } from 'react-icons/fa';
+import { useAuth } from './context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 // Background video or image
 import pizzaVideo from './pizza.mp4';
@@ -232,6 +235,8 @@ const Footer = styled.div`
 `;
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -240,20 +245,50 @@ const Login = () => {
   const [message, setMessage] = useState({ text: '', error: false });
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', error: false });
 
-    // Simulate login API call
-    setTimeout(() => {
-      if (email === 'test@example.com' && password === 'password123') {
-        setMessage({ text: 'Login successful!', error: false });
-      } else {
-        setMessage({ text: 'Invalid email or password.', error: true });
+    try {
+      console.log('Attempting login with:', { email });
+      
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      console.log('Response status:', response.status);
+      
+      // Check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(errorText || "Login failed");
       }
+
+      const data = await response.json();
+      console.log('Login successful:', data);
+
+      // Use the login function from AuthContext
+      login(data.user, data.token);
+
+      setMessage({ text: 'Login successful!', error: false });
+      toast.success("Login successful!");
+
+      // Redirect to home page
+      navigate("/");
+    } catch (error) {
+      console.error("Login error:", error);
+      setMessage({ text: error.message || "Login failed", error: true });
+      toast.error(error.message || "Login failed");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   const calculatePasswordStrength = (password) => {
