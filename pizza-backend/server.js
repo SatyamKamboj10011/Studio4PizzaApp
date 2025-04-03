@@ -121,6 +121,9 @@ app.post("/add/pizza", upload, (req, res) => {
     return res.status(400).send("No image uploaded.");
   }
 
+  
+  
+
   // Validate price fields
   const smallPrice = parseFloat(small_price);
   const largePrice = parseFloat(large_price);
@@ -404,6 +407,126 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
+app.put("/api/admin/menu/:id", upload, (req, res) => {
+  const { id } = req.params;
+  const { category } = req.query;
+  const { name, description, price, small_price, large_price, extra_large_price } = req.body;
+  const image = req.file ? req.file.filename : null;
+
+  let query = "";
+  let values = [];
+
+  if (category === "pizza") {
+    query = `UPDATE pizzas SET name = ?, small_price = ?, large_price = ?, extra_large_price = ?, description = ?${image ? ', image = ?' : ''} WHERE id = ?`;
+    values = image ? [name, small_price, large_price, extra_large_price, description, image, id] :
+                     [name, small_price, large_price, extra_large_price, description, id];
+  } else if (category === "side") {
+    query = `UPDATE side SET name = ?, small_price = ?, large_price = ?, description = ?${image ? ', image = ?' : ''} WHERE id = ?`;
+    values = image ? [name, small_price, large_price, description, image, id] :
+                     [name, small_price, large_price, description, id];
+  } else if (category === "dessert") {
+    query = `UPDATE desserts SET name = ?, price = ?, description = ?${image ? ', image = ?' : ''} WHERE id = ?`;
+    values = image ? [name, price, description, image, id] :
+                     [name, price, description, id];
+  } else {
+    return res.status(400).send("Invalid category");
+  }
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Update error:", err);
+      return res.status(500).send("Failed to update item");
+    }
+    res.send("Item updated successfully");
+  });
+});
+
+//menu update admin features
+
+app.delete("/api/admin/menu/:id", (req, res) => {
+  const { id } = req.params;
+  const { category } = req.query;
+
+  let table = "";
+  if (category === "pizza") table = "pizzas";
+  else if (category === "side") table = "side";
+  else if (category === "dessert") table = "desserts";
+  else return res.status(400).send("Invalid category");
+
+  const query = `DELETE FROM ${table} WHERE id = ?`;
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error("Delete error:", err);
+      return res.status(500).send("Failed to delete item");
+    }
+    res.send("Item deleted successfully");
+  });
+});
+
+//user update admin features
+app.put("/api/admin/users/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, email, phone, status } = req.body;
+
+  const query = `UPDATE users SET name = ?, email = ?, phone = ?, status = ? WHERE id = ?`;
+  db.query(query, [name, email, phone, status, id], (err, result) => {
+    if (err) return res.status(500).send("Error updating user");
+    res.send("User updated successfully");
+  });
+});
+
+app.delete("/api/admin/users/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("DELETE FROM users WHERE id = ?", [id], (err, result) => {
+    if (err) return res.status(500).send("Error deleting user");
+    res.send("User deleted successfully");
+  });
+});
+
+
+//post drinks
+app.post("/add/drinks", upload, (req, res) => {
+  const { name, price, description } = req.body;
+  const image = req.file ? req.file.filename : "";
+
+  if (!image) {
+    return res.status(400).send("No image uploaded.");
+  }
+
+  const parsedPrice = parseFloat(price);
+  if (isNaN(parsedPrice)) {
+    return res.status(400).send("Invalid price.");
+  }
+
+  const query = `
+    INSERT INTO drinks (name, price, image, description, category)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  const category = "cold"; // or dynamic if you want to support it
+
+  db.query(query, [name, parsedPrice, image, description, category], (err, result) => {
+    if (err) {
+      console.error("Error adding drink:", err);
+      return res.status(500).send("Database error while adding drink.");
+    }
+    res.status(201).send("Drink added successfully!");
+  });
+});
+
+
+//get drinks 
+app.get("/drinks", (req, res) => {
+  db.query("SELECT * FROM drinks", (err, result) => {
+    if (err) {
+      console.error("Error fetching drinks:", err);
+      return res.status(500).send("Error fetching drinks");
+    }
+    res.json(result);
+  });
+});
+
 
 // Start Server on Port 5000
 app.listen(5000, () => {
