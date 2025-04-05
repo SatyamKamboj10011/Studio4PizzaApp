@@ -23,9 +23,6 @@ jobs:
           npm install
           npm run build
 
-      - name: 📁 Debug – List Root Files
-        run: ls -la
-
       - name: 🧹 Clean Server React Folder
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -46,25 +43,24 @@ jobs:
           sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
 
       - name: 📦 Zip Backend Folder
-        run: |
-          zip -r backend.zip pizza-backend -x "*/node_modules/*"
+        run: zip -r backend.zip pizza-backend -x "**/node_modules/*"
 
-      - name: 🚚 Upload Backend Zip to Server
+      - name: 🚚 Upload Backend Zip to /tmp on Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" scp backend.zip $SERVER_USERNAME@$SERVER_HOST:/home/$SERVER_USERNAME/
+          sshpass -p "$SERVER_PASSWORD" scp backend.zip $SERVER_USERNAME@$SERVER_HOST:/tmp/
 
-      - name: 🚀 Extract + Start Backend on Server
+      - name: 🚀 Extract + Start Backend with PM2
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            cd /home/$USER
+            cd /tmp
             unzip -o backend.zip
             cd pizza-backend
             npm install
