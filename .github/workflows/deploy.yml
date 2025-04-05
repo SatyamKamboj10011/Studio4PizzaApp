@@ -1,4 +1,4 @@
-name: Deploy React App with Backend and Security Scan
+name: Deploy Pizza App with Backend and Security Scan
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: 🚀 Deploy to Apache Server
+    name: 🚀 Deploy React + Backend to Server
     runs-on: ubuntu-latest
 
     steps:
@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🔧 Install SSH & SSHPass
-        run: sudo apt-get install -y sshpass
+        run: sudo apt-get install -y sshpass zip unzip
 
       - name: 📦 Install Dependencies & Build React App
         run: |
@@ -23,8 +23,19 @@ jobs:
           npm install
           npm run build
 
-      - name: 📁 List files for debugging
+      - name: 📁 Debug – List Root Files
         run: ls -la
+
+      - name: 🧹 Clean Server React Folder
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+            sudo rm -rf /var/www/html/*
+            exit
+          EOF
 
       - name: 🚚 Upload React Build to Apache Server
         env:
@@ -32,33 +43,30 @@ jobs:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          echo "🧹 Cleaning old frontend files..."
-          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            sudo rm -rf /var/www/html/*
-            exit
-          EOF
-
-          echo "📤 Uploading new React build..."
           sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
 
-      - name: 🚚 Upload Backend to Server
+      - name: 📦 Zip Backend Folder
+        run: |
+          zip -r backend.zip pizza-backend -x "*/node_modules/*"
+
+      - name: 🚚 Upload Backend Zip to Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          echo "📤 Uploading backend files..."
-          sshpass -p "$SERVER_PASSWORD" scp -r pizza-backend $SERVER_USERNAME@$SERVER_HOST:/var/www/
+          sshpass -p "$SERVER_PASSWORD" scp backend.zip $SERVER_USERNAME@$SERVER_HOST:/home/$SERVER_USERNAME/
 
-      - name: 🚀 Start Node.js Backend with PM2
+      - name: 🚀 Extract + Start Backend on Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            echo "🔄 Starting backend with PM2..."
-            cd /var/www/pizza-backend
+            cd /home/$USER
+            unzip -o backend.zip
+            cd pizza-backend
             npm install
             pm2 start server.js || pm2 restart server.js
             pm2 save
