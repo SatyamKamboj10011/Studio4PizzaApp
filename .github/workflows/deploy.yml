@@ -1,74 +1,75 @@
-name: Deploy React App to Apache Server
- 
+name: Deploy React App with Backend and Security Scan
+
 on:
   push:
     branches:
-      - main  # Change this to your target branch if needed
- 
+      - main
+
 jobs:
   deploy:
     name: 🚀 Deploy to Apache Server
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
- 
+
       - name: 🔧 Install SSH & SSHPass
         run: sudo apt-get install -y sshpass
- 
+
       - name: 📦 Install Dependencies & Build React App
         run: |
-          export CI=false  # Prevent ESLint warnings from failing the build
+          export CI=false
           npm install
           npm run build
- 
-      - name: 🚚 Transfer Files to Apache Server
+
+      - name: 🚚 Transfer Frontend Build to Apache Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          echo "Connecting to $SERVER_HOST..."
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            echo "✅ Connected to server. Cleaning old files..."
+            echo "✅ Connected to server. Cleaning old frontend..."
             sudo rm -rf /var/www/html/*
             exit
           EOF
- 
-          echo "📤 Uploading new build files..."
+
+          echo "📤 Uploading React build files..."
           sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
- 
-      # - name: 🔁 (Optional) Restart Apache Server
-      #   if: always()
-      #   env:
-      #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      #     SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-      #     SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
-      #   run: |
-      #     sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-      #       echo "🔁 Restarting Apache..."
-      #       sudo systemctl restart apache2
-      #       exit
-      #     EOF
- 
+
+      - name: 🚀 Start Node.js Backend with PM2
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
+            echo "🔄 Starting backend..."
+            cd /var/www/html/backend  # Update this path if needed
+            npm install
+            pm2 start server.js || pm2 restart server.js
+            pm2 save
+            exit
+          EOF
+
   zap-scan:
     name: 🛡️ OWASP ZAP Security Scan
     runs-on: ubuntu-latest
-    needs: deploy  # Waits for deploy job to finish
- 
+    needs: deploy
+
     steps:
       - name: 🖥️ Debug Environment Info
         run: |
           echo "OS Info: $(uname -a)"
           echo "Runner Version: $RUNNER_VERSION"
- 
+
       - name: 🐳 Install Docker
         run: |
           curl -fsSL https://get.docker.com -o get-docker.sh
           sudo sh get-docker.sh
           docker --version
- 
+
       - name: 🔎 Run OWASP ZAP Full Scan
         run: |
           docker pull zaproxy/zap-stable
