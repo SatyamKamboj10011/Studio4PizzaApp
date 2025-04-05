@@ -18,25 +18,35 @@ jobs:
         run: sudo apt-get install -y sshpass
 
       - name: 📦 Install Dependencies & Build React App
+        working-directory: ./pizza-app  # go into your project folder
         run: |
           export CI=false
           npm install
           npm run build
 
-      - name: 🚚 Transfer Frontend Build to Apache Server
+      - name: 🚚 Upload React Build to Apache Server
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
+          echo "🧹 Cleaning old build..."
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            echo "✅ Connected to server. Cleaning old frontend..."
             sudo rm -rf /var/www/html/*
             exit
           EOF
 
-          echo "📤 Uploading React build files..."
-          sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
+          echo "📤 Uploading new React build..."
+          sshpass -p "$SERVER_PASSWORD" scp -r pizza-app/build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
+
+      - name: 🚚 Upload Backend to Server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          echo "📤 Uploading backend files..."
+          sshpass -p "$SERVER_PASSWORD" scp -r pizza-app/pizza-backend $SERVER_USERNAME@$SERVER_HOST:/var/www/
 
       - name: 🚀 Start Node.js Backend with PM2
         env:
@@ -46,7 +56,7 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
             echo "🔄 Starting backend..."
-            cd /var/www/html/backend  # Update this path if needed
+            cd /var/www/pizza-backend
             npm install
             pm2 start server.js || pm2 restart server.js
             pm2 save
@@ -59,11 +69,6 @@ jobs:
     needs: deploy
 
     steps:
-      - name: 🖥️ Debug Environment Info
-        run: |
-          echo "OS Info: $(uname -a)"
-          echo "Runner Version: $RUNNER_VERSION"
-
       - name: 🐳 Install Docker
         run: |
           curl -fsSL https://get.docker.com -o get-docker.sh
