@@ -187,24 +187,26 @@ const AdminDashboard = () => {
       setError(null);
 
       // Fetch all dashboard data
-      const [ordersResponse, pizzasResponse, dessertsResponse, sidesResponse, usersResponse] = await Promise.all([
+      const [ordersResponse, pizzasResponse, dessertsResponse, sidesResponse, usersResponse, drinksResponse] = await Promise.all([
         fetch("http://localhost:5000/orders"),
         fetch("http://localhost:5000/menu"),
         fetch("http://localhost:5000/desserts"),
         fetch("http://localhost:5000/side"),
-        fetch("http://localhost:5000/users")
+        fetch("http://localhost:5000/users"),
+        fetch("http://localhost:5000/drinks")
       ]);
 
       if (!ordersResponse.ok || !pizzasResponse.ok || !dessertsResponse.ok || !sidesResponse.ok || !usersResponse.ok) {
         throw new Error("Failed to fetch dashboard data");
       }
 
-      const [ordersData, pizzasData, dessertsData, sidesData, usersData] = await Promise.all([
+      const [ordersData, pizzasData, dessertsData, sidesData, usersData, drinksData] = await Promise.all([
         ordersResponse.json(),
         pizzasResponse.json(),
         dessertsResponse.json(),
         sidesResponse.json(),
-        usersResponse.json()
+        usersResponse.json(),
+        drinksResponse.json()
       ]);
 
       // Calculate statistics
@@ -214,7 +216,8 @@ const AdminDashboard = () => {
       const menuItems = [
         ...pizzasData.map(item => ({ ...item, category: 'pizza' })),
         ...dessertsData.map(item => ({ ...item, category: 'dessert' })),
-        ...sidesData.map(item => ({ ...item, category: 'side' }))
+        ...sidesData.map(item => ({ ...item, category: 'side' })),
+        ...drinksData.map(item => ({ ...item, category: 'drink' }))
       ];
 
       setStats({
@@ -237,6 +240,27 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
+
+  const handleDeleteUser = async (id) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+          method: "DELETE",
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to delete user");
+        }
+  
+        toast.success("User deleted successfully");
+        fetchDashboardData(); // Refresh users list
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        toast.error("Failed to delete user");
+      }
+    }
+  };
+  
 
   const handleAddItem = async (e) => {
     e.preventDefault();
@@ -283,6 +307,37 @@ const AdminDashboard = () => {
       toast.error("Failed to add menu item");
     }
   };
+
+  const handleEditUser = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/users/${selectedItem.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          status: formData.status
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update user");
+      }
+  
+      toast.success("User updated successfully");
+      setShowEditModal(false);
+      fetchDashboardData(); // Refresh user list
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error("Failed to update user");
+    }
+  };
+  
 
   const handleEditItem = async (e) => {
     e.preventDefault();
@@ -661,30 +716,50 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <Card.Body>
                     <StyledTable striped hover>
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Orders</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {users.map((user) => (
-                          <tr key={user.id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.phone}</td>
-                            <td>{user.orders?.length || 0}</td>
-                            <td>
-                              <Badge bg={user.status === "active" ? "success" : "danger"}>
-                                {user.status}
-                              </Badge>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
+                    <thead>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Orders</th>
+    <th>Status</th>
+    <th>Actions</th> {/* Add this */}
+  </tr>
+</thead>
+<tbody>
+  {users.map((user) => (
+    <tr key={user.id}>
+      <td>{user.name}</td>
+      <td>{user.email}</td>
+      <td>{user.phone}</td>
+      <td>{user.orders?.length || 0}</td>
+      <td>
+        <Badge bg={user.status === "active" ? "success" : "danger"}>
+          {user.status}
+        </Badge>
+      </td>
+      <td> {/* This is where you add the buttons */}
+        <ActionButton
+          className="edit-btn"
+          onClick={() => {
+            setSelectedItem(user);
+            // You can open a User Edit Modal here
+            // setShowEditUserModal(true);
+          }}
+        >
+          <FaEdit />
+        </ActionButton>
+        <ActionButton
+          className="delete-btn"
+          onClick={() => handleDeleteUser(user.id)}
+        >
+          <FaTrash />
+        </ActionButton>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
                     </StyledTable>
                   </Card.Body>
                 </DashboardCard>
@@ -756,6 +831,54 @@ const AdminDashboard = () => {
           </Form>
         </Modal.Body>
       </Modal>
+
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title>Edit User</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form onSubmit={handleEditUser}>
+      <Form.Group className="mb-3">
+        <Form.Label>Name</Form.Label>
+        <Form.Control
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Email</Form.Label>
+        <Form.Control
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Phone</Form.Label>
+        <Form.Control
+          type="text"
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Status</Form.Label>
+        <Form.Select
+          value={formData.status}
+          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+        >
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </Form.Select>
+      </Form.Group>
+      <Button type="submit" variant="primary">Update User</Button>
+    </Form>
+  </Modal.Body>
+</Modal>
+
 
       {/* Edit Menu Item Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>

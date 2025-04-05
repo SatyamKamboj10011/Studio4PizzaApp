@@ -226,7 +226,7 @@ const PizzaMenu = () => {
     <Container fluid>
       <HeroSection>
         <HeroOverlay>
-          <h1 style={{ fontSize: "4rem", fontWeight: "bold", marginBottom: "20px" }}>🍕 Welcome to Pizza Paradise</h1>
+          <h1 style={{ fontSize: "4rem", fontWeight: "bold", marginBottom: "20px" }}>🍕 Welcome to Pizza Heaven</h1>
           <p style={{ fontSize: "1.5rem", marginBottom: "0" }}>Choose your favorite pizza, sides, or drinks!</p>
         </HeroOverlay>
       </HeroSection>

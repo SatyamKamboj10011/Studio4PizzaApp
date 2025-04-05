@@ -59,12 +59,21 @@ const NavbarComponent = () => {
             <StyledNavLink to="/side">Side</StyledNavLink>
             <StyledNavLink to="/dessert">Dessert</StyledNavLink>
             <StyledNavLink to="/drinks">Drink</StyledNavLink>
-            <StyledNavLink to="/cart">Cart</StyledNavLink>
-            <StyledNavLink to="/addmenu">AddMenuPage</StyledNavLink>
+
+            {user?.role === "customer" && (
+              <>
+                <StyledNavLink to="/cart">Cart</StyledNavLink>
+              </>
+            )}
+
             {user?.role === "admin" && (
-              <StyledNavLink to="/admin">Admin Dashboard</StyledNavLink>
+              <>
+                <StyledNavLink to="/addmenu">AddMenuPage</StyledNavLink>
+                <StyledNavLink to="/admin">Admin Dashboard</StyledNavLink>
+              </>
             )}
           </Nav>
+
           <Nav>
             {user ? (
               <>

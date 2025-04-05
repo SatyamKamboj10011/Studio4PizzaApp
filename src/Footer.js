@@ -9,7 +9,7 @@ const Footer = () => {
       <Container>
         <Row>
           <Col md={4}>
-            <h5>Pizza Palace</h5>
+            <h5>Pizza Heaven</h5>
             <p className="mt-2">
               The best pizza in town, now delivered straight to your door!
             </p>

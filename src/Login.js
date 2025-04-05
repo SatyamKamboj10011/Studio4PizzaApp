@@ -313,7 +313,7 @@ const Login = () => {
         transition={{ duration: 0.5 }}
       >
         {/* <Logo src={logo} alt="Pizza Heaven Logo" /> */}
-        <Title>Slice & Dice</Title>
+        <Title>Pizza Heaven</Title>
 
         <InputContainer>
           <Icon>
