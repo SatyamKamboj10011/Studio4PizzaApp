@@ -18,11 +18,13 @@ jobs:
         run: sudo apt-get install -y sshpass
 
       - name: 📦 Install Dependencies & Build React App
-        working-directory: ./pizza-app  # go into your project folder
         run: |
           export CI=false
           npm install
           npm run build
+
+      - name: 📁 List files for debugging
+        run: ls -la
 
       - name: 🚚 Upload React Build to Apache Server
         env:
@@ -30,14 +32,14 @@ jobs:
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          echo "🧹 Cleaning old build..."
+          echo "🧹 Cleaning old frontend files..."
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
             sudo rm -rf /var/www/html/*
             exit
           EOF
 
           echo "📤 Uploading new React build..."
-          sshpass -p "$SERVER_PASSWORD" scp -r pizza-app/build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
+          sshpass -p "$SERVER_PASSWORD" scp -r build/* $SERVER_USERNAME@$SERVER_HOST:/var/www/html/
 
       - name: 🚚 Upload Backend to Server
         env:
@@ -46,7 +48,7 @@ jobs:
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
           echo "📤 Uploading backend files..."
-          sshpass -p "$SERVER_PASSWORD" scp -r pizza-app/pizza-backend $SERVER_USERNAME@$SERVER_HOST:/var/www/
+          sshpass -p "$SERVER_PASSWORD" scp -r pizza-backend $SERVER_USERNAME@$SERVER_HOST:/var/www/
 
       - name: 🚀 Start Node.js Backend with PM2
         env:
@@ -55,7 +57,7 @@ jobs:
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -tt -o StrictHostKeyChecking=no $SERVER_USERNAME@$SERVER_HOST << 'EOF'
-            echo "🔄 Starting backend..."
+            echo "🔄 Starting backend with PM2..."
             cd /var/www/pizza-backend
             npm install
             pm2 start server.js || pm2 restart server.js
