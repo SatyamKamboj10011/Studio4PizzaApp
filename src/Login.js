@@ -248,7 +248,7 @@ const Login = () => {
         setMessage({ text: 'Invalid email or password.', error: true });
       }
       setLoading(false);
-    }
+    }, 1000);
   };
 
   const calculatePasswordStrength = (password) => {

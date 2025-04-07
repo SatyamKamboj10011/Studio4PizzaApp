@@ -162,6 +162,7 @@ const DessertMenu = () => {
             <BakeryDining sx={{ mr: 1 }} /> Pastries
           </CategoryButton>
         </Box>
+      </Container>
 
       <Container sx={{ py: 6 }} maxWidth="lg">
         <Box sx={{ display: "flex", justifyContent: "center", mb: 4, gap: 2 }}>
