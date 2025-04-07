@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { styled } from "@mui/system";
 import { AppBar, Toolbar, IconButton, Typography, Button, Badge, InputBase, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { useAuth } from "./context/AuthContext";
 
 // Styled components
 const CustomNavbar = styled(AppBar)(({ theme }) => ({
@@ -16,50 +15,30 @@ const CustomNavbar = styled(AppBar)(({ theme }) => ({
   borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
 }));
 
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: "20px",
-  backgroundColor: "rgba(255, 255, 255, 0.1)",
-  marginLeft: theme.spacing(2),
-  width: "100%",
-  maxWidth: "300px",
-  display: "flex",
-  alignItems: "center",
-  padding: "0.25rem 0.5rem",
-}));
+const StyledNavLink = styled(Link)`
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  color: "white",
-  padding: theme.spacing(0, 1),
-  pointerEvents: "none",
-}));
+  &:hover {
+    color: #ff4b2b;
+    transform: translateY(-2px);
+  }
+`;
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "white",
-  width: "100%",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(2)})`,
-  },
-}));
-
-const Navbar = () => {
+const NavbarComponent = () => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState(); // Example cart items count
 
-  const handleMenu = (event) => {
+  const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
   };
 
   const navLinks = [
@@ -69,6 +48,7 @@ const Navbar = () => {
     { path: "/drink", name: "Drink" },
     { path: "/addmenu", name: "Add Menu" },
     { path: "/checkout", name: "Checkout" },
+    { path: "/", name: "Login" }, // Added Login link
   ];
 
   return (
@@ -79,7 +59,7 @@ const Navbar = () => {
           edge="start"
           color="inherit"
           aria-label="menu"
-          onClick={handleMenu}
+          onClick={handleMenuOpen}
           sx={{ display: { xs: "block", sm: "none" } }}
         >
           <MenuIcon />
@@ -89,11 +69,11 @@ const Navbar = () => {
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
-          onClose={handleClose}
+          onClose={handleMenuClose}
           sx={{ display: { xs: "block", sm: "none" } }}
         >
           {navLinks.map((item, index) => (
-            <MenuItem key={index} component={Link} to={item.path} onClick={handleClose}>
+            <MenuItem key={index} component={Link} to={item.path} onClick={handleMenuClose}>
               {item.name}
             </MenuItem>
           ))}
@@ -121,12 +101,7 @@ const Navbar = () => {
           <SearchIconWrapper>
             <SearchIcon />
           </SearchIconWrapper>
-          <StyledInputBase
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            inputProps={{ 'aria-label': 'search' }}
-          />
+          <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
         </Search>
 
         {/* Navigation Links */}
@@ -153,31 +128,12 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Authentication Buttons */}
-        {isAuthenticated ? (
-          <>
-            <Button color="inherit" component={Link} to="/cart">
-              <Badge badgeContent={4} color="secondary">
-                <ShoppingCartIcon />
-              </Badge>
-            </Button>
-            <Button color="inherit" onClick={handleMenu}>
-              {user?.name || 'User'}
-            </Button>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem component={Link} to="/profile">Profile</MenuItem>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            </Menu>
-          </>
-        ) : (
-          <Button color="inherit" component={Link} to="/login">
-            Login
-          </Button>
-        )}
+        {/* Cart Icon */}
+        <IconButton component={Link} to="/cart" color="inherit" sx={{ ml: 2 }}>
+          <Badge badgeContent={cartItems} color="error">
+            <ShoppingCartIcon />
+          </Badge>
+        </IconButton>
       </Toolbar>
     </CustomNavbar>
   );

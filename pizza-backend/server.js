@@ -5,7 +5,6 @@ require("dotenv").config();
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
-const crypto = require("crypto"); // For unique order IDs
 
 const app = express();
 app.use(cors());
@@ -50,14 +49,14 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root", // Default XAMPP MySQL user
   password: "", // Default is empty
-  database: "pizza_ordering_db",
+  database: "pizza_ordering_db", // Make sure this matches your database name
 });
 
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed: " + err.message);
   } else {
-    console.log("Connected to MySQL Database!");
+    console.log("Connected to MySQL Database: pizza_ordering_db");
   }
 });
 
@@ -167,6 +166,8 @@ app.post("/checkout", (req, res) => {
     res.status(201).json({ message: "Order placed successfully!" });
   });
 });
+
+
 
 // Start Server on Port 5000
 app.listen(5000, () => {

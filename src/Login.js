@@ -2,10 +2,6 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaApple, FaSpinner } from 'react-icons/fa';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Background video or image
 import pizzaVideo from './pizza.mp4';
@@ -229,6 +225,8 @@ const Footer = styled.div`
 
 // Main Login Component
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -236,50 +234,19 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', error: false });
   const [passwordStrength, setPasswordStrength] = useState(0);
-  
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { login } = useAuth();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', error: false });
 
-    try {
-      if (!email || !password) {
-        throw new Error('Please fill in all fields');
+    // Simulate login API call
+    setTimeout(() => {
+      if (email === 'test@example.com' && password === 'password123') {
+        setMessage({ text: 'Login successful!', error: false });
+      } else {
+        setMessage({ text: 'Invalid email or password.', error: true });
       }
-
-      // Call the login function from AuthContext
-      await login(email, password);
-
-      // Show success message
-      toast.success('Login successful! Redirecting...', {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
-      // Redirect to the page user tried to visit or home
-      const from = location.state?.from?.pathname || '/home';
-      setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 1000);
-    } catch (error) {
-      setMessage({ text: error.message || 'Login failed. Please try again.', error: true });
-      toast.error(error.message || 'Login failed. Please try again.', {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    } finally {
       setLoading(false);
     }
   };

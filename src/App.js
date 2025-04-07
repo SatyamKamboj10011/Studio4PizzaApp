@@ -1,7 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Pizza from "./Pizza";
 import Home from "./Home";
 import Drink from "./Drink";
@@ -14,68 +12,42 @@ import ContactUs from "./ContacUs";
 import Registration from "./Registration";
 import Login from "./Login";
 import Footer from "./Footer";
-import { AuthProvider } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import CartPage from "./Cart";
+import UserDashboard from"./UserDashboard";
+import Invoice from "./Invoice";
+import Checkout from "./Checkout";
+
+import Register from "./Registration";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Navbar />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/Registration" element={<Registration />} />
-          
-          {/* Protected Routes */}
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } />
-          <Route path="/pizzas" element={
-            <ProtectedRoute>
-              <Pizza />
-            </ProtectedRoute>
-          } />
-          <Route path="/drink" element={
-            <ProtectedRoute>
-              <Drink />
-            </ProtectedRoute>
-          } />
-          <Route path="/side" element={
-            <ProtectedRoute>
-              <SideMenu />
-            </ProtectedRoute>
-          } />
-          <Route path="/dessert" element={
-            <ProtectedRoute>
-              <DessertMenu />
-            </ProtectedRoute>
-          } />
-          <Route path="/addmenu" element={
-            <ProtectedRoute>
-              <AddMenuPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/about" element={
-            <ProtectedRoute>
-              <AboutUs />
-            </ProtectedRoute>
-          } />
-          <Route path="/contact" element={
-            <ProtectedRoute>
-              <ContactUs />
-            </ProtectedRoute>
-          } />
-          
-          {/* Redirect root to home if authenticated, login if not */}
-          <Route path="/" element={<Navigate to="/home" replace />} />
-        </Routes>
-        <Footer />
-        <ToastContainer />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/home" element={<Home />} />
+      
+        <Route path="/pizzas" element={<Pizza />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/drink" element={<Drink />} />
+        <Route path="/side" element={<SideMenu />} />
+        <Route path="/dessert" element={<DessertMenu />} />
+        <Route path="/addmenu" element={<AddMenuPage/>}/>
+        <Route path="/aboutus" element={<AboutUs/>}/>
+        <Route path="/contact" element={<ContactUs/>}/>
+        <Route path="/cart" element={<CartPage/>}/>
+        <Route path="/userdashboard" element={<UserDashboard/>}/>
+        <Route path="/Registration" element={<Register/>}/>
+<Route path="/login" element={<Login/>}/>
+        {/* <Route path="/checkout" element={<Checkout />} /> */}
+      
+       
+       
+        <Route path="/invoice" element={<Invoice />} />
+        <Route path="/checkout" element={<Checkout />} />
+      </Routes>
+      <Footer />
+
+    </Router>
   );
 }
 
